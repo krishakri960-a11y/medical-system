@@ -1,0 +1,115 @@
+{% extends "base.html" %}
+{% block title %}MedInventory Pro — Clinical Supply & Billing{% endblock %}
+{% block body_class %}bg-light{% endblock %}
+{% block body %}
+<nav class="navbar navbar-expand-lg navbar-dark navbar-landing fixed-top">
+  <div class="container">
+    <a class="navbar-brand fw-semibold" href="#"><i class="bi bi-capsule-pill me-2 text-info"></i>MedInventory Pro</a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navMain">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navMain">
+      <ul class="navbar-nav ms-auto align-items-lg-center gap-2">
+        <li class="nav-item"><a class="nav-link" href="#capabilities">Capabilities</a></li>
+        <li class="nav-item"><a class="nav-link" href="#analytics">Analytics</a></li>
+        <li class="nav-item"><a class="nav-link" href="#cta">Sign in</a></li>
+        <li class="nav-item ms-lg-2"><a class="btn btn-sm btn-light text-dark px-3" href="{{ url_for('main.login') }}">Login</a></li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<section class="hero-gradient text-white pt-5 pb-5" style="padding-top: 7rem !important;">
+  <div class="container py-5">
+    <div class="row align-items-center g-5">
+      <div class="col-lg-7">
+        <span class="badge bg-white bg-opacity-10 border border-white border-opacity-25 mb-3">Pharmacy-grade operations</span>
+        <h1 class="display-4 fw-bold lh-sm mb-4">Medical inventory, billing, and analytics in one professional workspace</h1>
+        <p class="lead text-white-50 mb-4">Control brands, batches, expiry, purchases, and customer billing with role-based access for administrators and front-desk staff—built for clinics, pharmacies, and distributors.</p>
+        <div class="d-flex flex-wrap gap-3">
+          <a href="{{ url_for('main.login') }}" class="btn btn-light btn-lg px-4"><i class="bi bi-box-arrow-in-right me-2"></i>Access console</a>
+          <a href="#capabilities" class="btn btn-outline-light btn-lg px-4">Explore features</a>
+        </div>
+      </div>
+      <div class="col-lg-5">
+        <div class="card bg-white bg-opacity-10 border border-white border-opacity-25 text-white p-4 rounded-4">
+          <h5 class="fw-semibold mb-3">Live operational pulse</h5>
+          <ul class="list-unstyled mb-0 small text-white-75">
+            <li class="mb-2"><i class="bi bi-check-circle-fill text-info me-2"></i>Expiry-aware stock with low-stock alerts</li>
+            <li class="mb-2"><i class="bi bi-check-circle-fill text-info me-2"></i>GST-ready bills with discount &amp; tax</li>
+            <li class="mb-2"><i class="bi bi-check-circle-fill text-info me-2"></i>Returns with automatic stock restoration</li>
+            <li><i class="bi bi-check-circle-fill text-info me-2"></i>Revenue, profit, and category analytics</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="capabilities" class="py-5">
+  <div class="container py-4">
+    <div class="text-center mb-5">
+      <h2 class="fw-bold">Enterprise-grade capability map</h2>
+      <p class="text-muted col-lg-8 mx-auto">Every module your admin needs—plus a streamlined desk workflow for staff.</p>
+    </div>
+    <div class="row g-4">
+      <div class="col-md-4">
+        <div class="card card-soft h-100 p-4">
+          <div class="landing-feature-icon mb-3"><i class="bi bi-box-seam fs-4"></i></div>
+          <h5 class="fw-semibold">Inventory &amp; expiry</h5>
+          <p class="text-muted small mb-0">Batch tracking, suppliers, purchases, stock valuation, and proactive expiry management.</p>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="card card-soft h-100 p-4">
+          <div class="landing-feature-icon mb-3"><i class="bi bi-receipt-cutoff fs-4"></i></div>
+          <h5 class="fw-semibold">Billing &amp; returns</h5>
+          <p class="text-muted small mb-0">Fast billing with customer profiles, printable invoices, and controlled returns.</p>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="card card-soft h-100 p-4">
+          <div class="landing-feature-icon mb-3"><i class="bi bi-graph-up-arrow fs-4"></i></div>
+          <h5 class="fw-semibold">Reports &amp; analytics</h5>
+          <p class="text-muted small mb-0">Sales trends, profit views, best sellers, and export-ready operational reports.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="analytics" class="py-5 bg-white">
+  <div class="container py-4">
+    <div class="row align-items-center g-5">
+      <div class="col-lg-6 order-lg-2">
+        <h3 class="fw-bold mb-3">Decisions backed by data</h3>
+        <p class="text-muted">Administrators see consolidated dashboards with total revenue, margin, category and brand contribution, daily and monthly trends, and expiry-loss exposure—without leaving the browser.</p>
+        <ul class="list-unstyled">
+          <li class="mb-2"><span class="badge rounded-pill text-bg-primary me-2">Admin</span> Full CRUD across master data, staff lifecycle, and compliance reporting.</li>
+          <li><span class="badge rounded-pill text-bg-secondary me-2">Staff</span> Focused POS flow: medicines, billing, personal sales, and returns.</li>
+        </ul>
+      </div>
+      <div class="col-lg-6 order-lg-1">
+        <div class="rounded-4 border p-4 shadow-sm bg-light">
+          <div class="d-flex justify-content-between mb-2"><span class="text-muted small">Net margin</span><span class="fw-semibold text-success">Tracked per line</span></div>
+          <div class="progress mb-3" style="height:8px;"><div class="progress-bar bg-success" style="width:72%"></div></div>
+          <div class="d-flex justify-content-between mb-2"><span class="text-muted small">Category mix</span><span class="fw-semibold text-primary">Chart-ready</span></div>
+          <div class="progress mb-0" style="height:8px;"><div class="progress-bar" style="width:55%"></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="cta" class="py-5 hero-gradient text-white text-center">
+  <div class="container py-5">
+    <h2 class="fw-bold mb-3">Ready to run your medical desk professionally?</h2>
+    <p class="text-white-50 mb-4 col-lg-6 mx-auto">Use the default administrator account after seeding, or create your own staff accounts from the admin console.</p>
+    <a href="{{ url_for('main.login') }}" class="btn btn-light btn-lg px-5">Sign in to MedInventory Pro</a>
+  </div>
+</section>
+
+<footer class="py-4 bg-dark text-white-50 text-center small">
+  <div class="container">MedInventory Pro — Python / Flask · For demonstration and internal operations</div>
+</footer>
+{% endblock %}

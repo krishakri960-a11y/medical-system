@@ -1,0 +1,66 @@
+{% extends "staff/layout.html" %}
+{% block breadcrumb %}Sales · <a href="{{ url_for('staff.returns_list') }}" class="text-muted text-decoration-none">Returns</a>{% endblock %}
+{% block page_title %}New return{% endblock %}
+{% block content %}
+<p class="text-muted small mb-4">Select one of your bills, choose the line, and enter the quantity to return to stock. Refund is calculated at the original sale rate.</p>
+<div class="row justify-content-center">
+  <div class="col-lg-7">
+    <div class="card card-soft p-4">
+      {% if not bills %}
+      <p class="text-muted mb-0">You need at least one bill to process a return. <a href="{{ url_for('staff.billing') }}">Create a bill</a>.</p>
+      {% else %}
+      <form method="post" id="retForm">
+        <div class="mb-3">
+          <label class="form-label">Bill</label>
+          <select class="form-select" name="bill_id" id="billId" required>
+            {% for b in bills %}<option value="{{ b.id }}">{{ b.bill_number }} — {{ b.customer.name }} · {{ b.created_at.strftime('%Y-%m-%d') }}</option>{% endfor %}
+          </select>
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Line item</label>
+          <select class="form-select" name="medicine_id" id="medId" required></select>
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Quantity</label>
+          <input type="number" class="form-control" name="quantity" min="1" value="1" required>
+        </div>
+        <div class="mb-4">
+          <label class="form-label">Reason <span class="text-muted fw-normal">(optional)</span></label>
+          <input class="form-control" name="reason" placeholder="e.g. Patient allergic reaction, damaged strip">
+        </div>
+        <div class="d-flex flex-wrap gap-2">
+          <button type="submit" class="btn btn-staff-brand">Submit return</button>
+          <a href="{{ url_for('staff.returns_list') }}" class="btn btn-outline-secondary">Cancel</a>
+        </div>
+      </form>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}
+{% block scripts %}
+{% if bills %}
+<script>
+(function(){
+  const apiUrlTemplate = "{{ url_for('staff.api_bill_lines', bid=0) }}";
+  function loadLines(){
+    const bid = document.getElementById('billId').value;
+    const sel = document.getElementById('medId');
+    sel.innerHTML = '';
+    if(!bid) return;
+    const url = apiUrlTemplate.replace('/bill/0/', '/bill/' + bid + '/');
+    fetch(url).then(function(r){ return r.json(); }).then(function(data){
+      data.forEach(function(l){
+        const o = document.createElement('option');
+        o.value = l.medicine_id;
+        o.textContent = l.name + ' (max ' + l.max_qty + ')';
+        sel.appendChild(o);
+      });
+    });
+  }
+  document.getElementById('billId').addEventListener('change', loadLines);
+  loadLines();
+})();
+</script>
+{% endif %}
+{% endblock %}

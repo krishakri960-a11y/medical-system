@@ -1,0 +1,5 @@
+{% extends "admin/layout.html" %}{% block page_title %}Report · Expired{% endblock %}{% block content %}
+<button class="btn btn-sm btn-primary mb-3 no-print float-end" onclick="window.print()">Print</button>
+<div class="card card-soft table-responsive"><table class="table table-sm mb-0"><thead><tr><th>Medicine</th><th>Batch</th><th>Qty</th><th>Expiry</th></tr></thead><tbody>
+{% for m in rows %}<tr><td>{{ m.name }}</td><td>{{ m.batch_number }}</td><td>{{ m.quantity }}</td><td>{{ m.expiry_date }}</td></tr>{% else %}<tr><td colspan="4">None.</td></tr>{% endfor %}
+</tbody></table></div>{% endblock %}

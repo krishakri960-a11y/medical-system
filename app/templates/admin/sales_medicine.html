@@ -1,0 +1,17 @@
+{% extends "admin/layout.html" %}
+{% block page_title %}Medicine-wise sales{% endblock %}
+{% block content %}
+<div class="mb-3"><a href="{{ url_for('admin.sales') }}" class="btn btn-outline-secondary btn-sm">← All sales</a></div>
+<div class="card card-soft table-responsive">
+  <table class="table mb-0">
+    <thead><tr><th>Medicine</th><th class="text-end">Qty sold</th><th class="text-end">Amount</th></tr></thead>
+    <tbody>
+      {% for r in rows %}
+      <tr><td>{{ r.name }}</td><td class="text-end">{{ r.qty }}</td><td class="text-end">₹ {{ '%.2f'|format(r.amt|float) }}</td></tr>
+      {% else %}
+      <tr><td colspan="3" class="text-muted">No data.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

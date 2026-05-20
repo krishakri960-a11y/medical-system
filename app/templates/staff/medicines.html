@@ -1,0 +1,65 @@
+{% extends "staff/layout.html" %}
+{% from "staff/_macros.html" import badge_stock, pagination_nav with context %}
+{% block breadcrumb %}Inventory · Catalogue{% endblock %}
+{% block page_title %}Medicines{% endblock %}
+{% block content %}
+<p class="text-muted small mb-4">Browse inventory (read-only). Use filters to find batch, brand, or category.</p>
+
+<form class="row g-2 mb-4 align-items-end flex-wrap" method="get" action="{{ url_for('staff.medicines') }}">
+  <div class="col-auto flex-grow-1" style="min-width:200px;max-width:320px">
+    <label class="form-label small text-muted mb-1">Search</label>
+    <div class="input-group input-group-sm">
+      <span class="input-group-text bg-white border-end-0"><i class="bi bi-search text-muted"></i></span>
+      <input class="form-control border-start-0" name="q" value="{{ q }}" placeholder="Name or batch" autocomplete="off">
+    </div>
+  </div>
+  <div class="col-auto" style="min-width:150px">
+    <label class="form-label small text-muted mb-1">Brand</label>
+    <select class="form-select form-select-sm" name="brand_id">
+      <option value="">All brands</option>
+      {% for b in brands %}<option value="{{ b.id }}" {% if brand_id == b.id %}selected{% endif %}>{{ b.name }}</option>{% endfor %}
+    </select>
+  </div>
+  <div class="col-auto" style="min-width:150px">
+    <label class="form-label small text-muted mb-1">Category</label>
+    <select class="form-select form-select-sm" name="category_id">
+      <option value="">All categories</option>
+      {% for c in categories %}<option value="{{ c.id }}" {% if category_id == c.id %}selected{% endif %}>{{ c.name }}</option>{% endfor %}
+    </select>
+  </div>
+  <div class="col-auto d-flex gap-2">
+    <button type="submit" class="btn btn-sm btn-staff-brand">Apply</button>
+    {% if q or brand_id or category_id %}<a href="{{ url_for('staff.medicines') }}" class="btn btn-sm btn-outline-secondary">Reset</a>{% endif %}
+  </div>
+</form>
+
+<div class="card card-soft table-responsive">
+  <table class="table table-hover mb-0 align-middle">
+    <thead class="table-light">
+      <tr>
+        <th>Medicine</th>
+        <th>Batch</th>
+        <th>Brand / Category</th>
+        <th>Stock</th>
+        <th>Expiry</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for m in medicines %}
+      <tr>
+        <td class="fw-semibold">{{ m.name }}</td>
+        <td class="small font-monospace">{{ m.batch_number }}</td>
+        <td class="small text-muted">{{ m.brand.name }} · {{ m.category.name }}</td>
+        <td>{{ badge_stock(m) }} <span class="small text-muted ms-1">{{ m.quantity }}</span></td>
+        <td class="small {% if m.expiry_date < today %}text-danger fw-semibold{% endif %}">{{ m.expiry_date }}</td>
+        <td class="text-end"><a class="btn btn-sm btn-outline-secondary" href="{{ url_for('staff.medicine_detail', mid=m.id) }}">Details</a></td>
+      </tr>
+      {% else %}
+      <tr><td colspan="6" class="empty-state">No medicines match your filters.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{{ pagination_nav(pagination) }}
+{% endblock %}

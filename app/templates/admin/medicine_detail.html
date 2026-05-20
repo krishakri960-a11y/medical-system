@@ -1,0 +1,62 @@
+{% extends "admin/layout.html" %}
+{% from "admin/_macros.html" import detail_row, badge_stock with context %}
+{% block breadcrumb %}<a href="{{ url_for('admin.medicines') }}" class="text-muted text-decoration-none">Medicines</a> · Detail{% endblock %}
+{% block page_title %}{{ medicine.name }}{% endblock %}
+{% block content %}
+<div class="d-flex flex-wrap gap-2 mb-3">
+  <a href="{{ url_for('admin.medicines') }}" class="btn btn-outline-secondary btn-sm"><i class="bi bi-arrow-left"></i> Catalogue</a>
+  <a href="{{ url_for('admin.medicine_edit', mid=medicine.id) }}" class="btn btn-primary btn-sm"><i class="bi bi-pencil"></i> Edit line</a>
+  {% if medicine.bill_items.count() == 0 %}
+  <form method="post" action="{{ url_for('admin.medicine_delete', mid=medicine.id) }}" class="d-inline" onsubmit="return confirm('Delete this batch?');"><button class="btn btn-outline-danger btn-sm" type="submit">Delete</button></form>
+  {% endif %}
+</div>
+<div class="row g-3 mb-3">
+  <div class="col-md-3"><div class="card card-soft p-3 text-center"><div class="text-muted small">On hand</div><div class="fs-3 fw-bold">{{ medicine.quantity }}</div></div></div>
+  <div class="col-md-3"><div class="card card-soft p-3 text-center"><div class="text-muted small">Min. level</div><div class="fs-3 fw-bold">{{ medicine.min_stock_level }}</div></div></div>
+  <div class="col-md-3"><div class="card card-soft p-3 text-center"><div class="text-muted small">Units sold (all time)</div><div class="fs-3 fw-bold">{{ units_sold }}</div></div></div>
+  <div class="col-md-3"><div class="card card-soft p-3 text-center"><div class="text-muted small">Revenue from line</div><div class="fs-3 fw-bold text-success">₹ {{ '%.2f'|format(revenue|float) }}</div></div></div>
+</div>
+<div class="row g-3">
+  <div class="col-lg-5">
+    <div class="card card-soft detail-card">
+      <div class="card-header d-flex justify-content-between"><span>Product definition</span>{{ badge_stock(medicine) }}</div>
+      <div class="card-body p-0">
+        {{ detail_row("Internal ID", "#" ~ medicine.id) }}
+        {{ detail_row("Batch number", medicine.batch_number) }}
+        {{ detail_row("Brand", medicine.brand.name) }}
+        {{ detail_row("Category", medicine.category.name) }}
+        {{ detail_row("Supplier", medicine.supplier.name ~ ' · ' ~ (medicine.supplier.company_name or '—')) }}
+        {{ detail_row("Manufacturing date", medicine.manufacturing_date) }}
+        {{ detail_row("Expiry date", medicine.expiry_date) }}
+        {{ detail_row("Purchase price", "₹ " ~ '%.2f'|format(medicine.purchase_price|float)) }}
+        {{ detail_row("Selling price", "₹ " ~ '%.2f'|format(medicine.selling_price|float)) }}
+        {{ detail_row("Stock value @ cost", "₹ " ~ '%.2f'|format(stock_value|float)) }}
+        {{ detail_row("Description", medicine.description or "—") }}
+        {{ detail_row("Created", medicine.created_at.strftime('%Y-%m-%d %H:%M') if medicine.created_at else "—") }}
+      </div>
+    </div>
+  </div>
+  <div class="col-lg-7">
+    <div class="card card-soft detail-card mb-3">
+      <div class="card-header">Recent sales (line items)</div>
+      <div class="table-responsive">
+        <table class="table table-sm mb-0"><thead><tr><th>Date</th><th>Bill</th><th>Qty</th><th class="text-end">Line ₹</th></tr></thead>
+        <tbody>
+          {% for li in recent_items %}<tr><td class="small">{{ li.bill.created_at.strftime('%Y-%m-%d') }}</td><td><a href="{{ url_for('admin.bill_detail', bid=li.bill_id) }}">{{ li.bill.bill_number }}</a></td><td>{{ li.quantity }}</td><td class="text-end">₹ {{ '%.2f'|format(li.line_total|float) }}</td></tr>
+          {% else %}<tr><td colspan="4" class="text-muted p-3">No sales yet.</td></tr>{% endfor %}
+        </tbody></table>
+      </div>
+    </div>
+    <div class="card card-soft detail-card">
+      <div class="card-header">Purchase history</div>
+      <div class="table-responsive">
+        <table class="table table-sm mb-0"><thead><tr><th>Date</th><th>Qty</th><th class="text-end">Total</th><th></th></tr></thead>
+        <tbody>
+          {% for p in purchase_rows %}<tr><td>{{ p.purchase_date }}</td><td>{{ p.quantity }}</td><td class="text-end">₹ {{ '%.2f'|format(p.total_amount|float) }}</td><td><a href="{{ url_for('admin.purchase_detail', pid=p.id) }}">View</a></td></tr>
+          {% else %}<tr><td colspan="4" class="text-muted p-3">No purchases.</td></tr>{% endfor %}
+        </tbody></table>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

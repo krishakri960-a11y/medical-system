@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+{% block body %}
+<div class="admin-shell d-flex">
+  <aside class="sidebar-admin no-print d-none d-lg-block">
+    <div class="brand-block">
+      <div class="d-flex align-items-center gap-2 text-white">
+        <span class="rounded-2 bg-info bg-opacity-25 d-flex p-2"><i class="bi bi-heart-pulse text-info"></i></span>
+        <div>
+          <div class="product-name fw-bold">MedInventory</div>
+          <div class="small text-secondary" style="font-size:0.7rem;">Enterprise admin</div>
+        </div>
+      </div>
+    </div>
+    <nav class="nav flex-column pb-4">
+      <div class="nav-section-label">Overview</div>
+      <a class="nav-link {% if request.endpoint == 'admin.dashboard' %}active{% endif %}" href="{{ url_for('admin.dashboard') }}"><i class="bi bi-speedometer2"></i> Dashboard</a>
+
+      <div class="nav-section-label">Master data</div>
+      <a class="nav-link {% if request.endpoint in ['admin.brands','admin.brand_detail','admin.brand_new','admin.brand_edit'] %}active{% endif %}" href="{{ url_for('admin.brands') }}"><i class="bi bi-tag"></i> Brands</a>
+      <a class="nav-link {% if request.endpoint in ['admin.categories','admin.category_detail','admin.category_new','admin.category_edit'] %}active{% endif %}" href="{{ url_for('admin.categories') }}"><i class="bi bi-grid"></i> Categories</a>
+      <a class="nav-link {% if request.endpoint in ['admin.suppliers','admin.supplier_detail','admin.supplier_new','admin.supplier_edit'] %}active{% endif %}" href="{{ url_for('admin.suppliers') }}"><i class="bi bi-truck"></i> Suppliers</a>
+      <a class="nav-link {% if request.endpoint in ['admin.medicines','admin.medicine_detail','admin.medicine_new','admin.medicine_edit'] %}active{% endif %}" href="{{ url_for('admin.medicines') }}"><i class="bi bi-capsule"></i> Medicines</a>
+      <a class="nav-link {% if request.endpoint in ['admin.customers','admin.customer_detail','admin.customer_new','admin.customer_edit'] %}active{% endif %}" href="{{ url_for('admin.customers') }}"><i class="bi bi-people"></i> Customers</a>
+
+      <div class="nav-section-label">Inventory &amp; buying</div>
+      <a class="nav-link {% if 'stock' in (request.endpoint or '') %}active{% endif %}" href="{{ url_for('admin.stock_index') }}"><i class="bi bi-boxes"></i> Stock</a>
+      <a class="nav-link {% if request.endpoint in ['admin.purchases','admin.purchase_detail','admin.purchase_new','admin.purchase_edit'] %}active{% endif %}" href="{{ url_for('admin.purchases') }}"><i class="bi bi-cart-plus"></i> Purchases</a>
+      <a class="nav-link {% if request.endpoint == 'admin.expiry_index' %}active{% endif %}" href="{{ url_for('admin.expiry_index') }}"><i class="bi bi-hourglass-bottom"></i> Expiry</a>
+
+      <div class="nav-section-label">Sales</div>
+      <a class="nav-link {% if 'billing' in (request.endpoint or '') %}active{% endif %}" href="{{ url_for('admin.billing_list') }}"><i class="bi bi-receipt"></i> Billing</a>
+      <a class="nav-link {% if request.endpoint in ['admin.sales','admin.sales_medicine_wise','admin.sales_daily','admin.sales_monthly'] %}active{% endif %}" href="{{ url_for('admin.sales') }}"><i class="bi bi-graph-up"></i> Sales</a>
+      <a class="nav-link {% if 'returns' in (request.endpoint or '') %}active{% endif %}" href="{{ url_for('admin.returns_list') }}"><i class="bi bi-arrow-return-left"></i> Returns</a>
+
+      <div class="nav-section-label">Insights</div>
+      <a class="nav-link" href="{{ url_for('admin.reports', name='stock') }}"><i class="bi bi-file-earmark-bar-graph"></i> Reports</a>
+      <a class="nav-link {% if request.endpoint == 'admin.analytics' %}active{% endif %}" href="{{ url_for('admin.analytics') }}"><i class="bi bi-pie-chart"></i> Analytics</a>
+
+      <div class="nav-section-label">System</div>
+      <a class="nav-link {% if request.endpoint in ['admin.staff_users','admin.staff_new','admin.staff_user_detail','admin.staff_user_edit'] %}active{% endif %}" href="{{ url_for('admin.staff_users') }}"><i class="bi bi-person-badge"></i> Staff</a>
+      <a class="nav-link {% if request.endpoint == 'admin.change_password' %}active{% endif %}" href="{{ url_for('admin.change_password') }}"><i class="bi bi-shield-lock"></i> Password</a>
+      <a class="nav-link text-danger mt-2" href="{{ url_for('main.logout') }}"><i class="bi bi-box-arrow-right"></i> Logout</a>
+    </nav>
+  </aside>
+  <div class="main-with-sidebar flex-grow-1">
+    <header class="topbar d-flex flex-wrap justify-content-between align-items-center gap-2 no-print">
+      <div class="d-flex align-items-center gap-2">
+        <button class="btn btn-outline-secondary btn-sm d-lg-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#adminMenu" aria-label="Menu"><i class="bi bi-list"></i></button>
+        <div>
+          <div class="admin-breadcrumb">{% block breadcrumb %}Administration{% endblock %}</div>
+          <h1 class="admin-page-title mb-0">{% block page_title %}Console{% endblock %}</h1>
+        </div>
+      </div>
+      <div class="d-flex align-items-center gap-3 text-end">
+        <div class="d-none d-md-block small text-muted">{{ moment or '' }}</div>
+        <div>
+          <div class="fw-semibold small">{{ current_user.full_name }}</div>
+          <span class="badge text-bg-primary rounded-pill">Administrator</span>
+        </div>
+      </div>
+    </header>
+    <main class="p-4 pt-3">
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% for cat, msg in messages %}
+          <div class="alert alert-{{ cat }} alert-dismissible fade show" role="alert">
+            {{ msg }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+          </div>
+        {% endfor %}
+      {% endwith %}
+      {% block content %}{% endblock %}
+    </main>
+  </div>
+</div>
+
+<div class="offcanvas offcanvas-start text-bg-dark d-lg-none" tabindex="-1" id="adminMenu">
+  <div class="offcanvas-header border-bottom border-secondary">
+    <span class="offcanvas-title fw-bold"><i class="bi bi-grid-3x3-gap me-2"></i>Menu</span>
+    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas"></button>
+  </div>
+  <div class="offcanvas-body p-0">
+    <a class="d-block px-3 py-2 text-white-50 text-decoration-none border-bottom border-secondary border-opacity-25" href="{{ url_for('admin.dashboard') }}">Dashboard</a>
+    <a class="d-block px-3 py-2 text-white-50 text-decoration-none border-bottom border-secondary border-opacity-25" href="{{ url_for('admin.brands') }}">Brands</a>
+    <a class="d-block px-3 py-2 text-white-50 text-decoration-none border-bottom border-secondary border-opacity-25" href="{{ url_for('admin.medicines') }}">Medicines</a>
+    <a class="d-block px-3 py-2 text-white-50 text-decoration-none border-bottom border-secondary border-opacity-25" href="{{ url_for('admin.stock_index') }}">Stock</a>
+    <a class="d-block px-3 py-2 text-white-50 text-decoration-none border-bottom border-secondary border-opacity-25" href="{{ url_for('admin.billing_list') }}">Billing</a>
+    <a class="d-block px-3 py-2 text-white-50 text-decoration-none border-bottom border-secondary border-opacity-25" href="{{ url_for('admin.purchases') }}">Purchases</a>
+    <a class="d-block px-3 py-2 text-white-50 text-decoration-none border-bottom border-secondary border-opacity-25" href="{{ url_for('admin.analytics') }}">Analytics</a>
+    <a class="d-block px-3 py-2 text-danger text-decoration-none" href="{{ url_for('main.logout') }}">Logout</a>
+  </div>
+</div>
+{% block scripts %}{% endblock %}
+{% endblock %}

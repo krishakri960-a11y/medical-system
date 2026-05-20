@@ -1,0 +1,28 @@
+{% extends "admin/layout.html" %}
+{% from "admin/_macros.html" import page_heading %}
+{% block breadcrumb %}<a href="{{ url_for('admin.purchases') }}" class="text-muted text-decoration-none">Purchases</a> · {% if purchase %}Edit{% else %}New{% endif %}{% endblock %}
+{% block page_title %}{% if purchase %}Edit purchase{% else %}New purchase{% endif %}{% endblock %}
+{% block content %}
+{{ page_heading("Procurement entry", "Select supplier and existing inventory batch; quantities increase stock automatically.") }}
+<div class="row justify-content-center"><div class="col-lg-8">
+<div class="card card-soft"><div class="card-body p-4">
+{% if purchase %}
+<div class="alert alert-info small mb-4">Medicine line is fixed to <strong>{{ purchase.medicine.name }}</strong> ({{ purchase.batch_number }}). To change product, delete this entry and create a new purchase.</div>
+{% endif %}
+<form method="post" action="{% if purchase %}{{ url_for('admin.purchase_edit', pid=purchase.id) }}{% else %}{{ url_for('admin.purchase_new') }}{% endif %}">
+  <div class="row g-3">
+    <div class="col-md-6"><label class="form-label fw-semibold">Supplier</label><select class="form-select" name="supplier_id" required>{% for s in suppliers %}<option value="{{ s.id }}" {% if purchase and purchase.supplier_id == s.id %}selected{% endif %}>{{ s.name }}</option>{% endfor %}</select></div>
+    <div class="col-md-6"><label class="form-label fw-semibold">Purchase date</label><input class="form-control" type="date" name="purchase_date" required value="{% if purchase %}{{ purchase.purchase_date }}{% else %}{{ today }}{% endif %}"></div>
+    {% if not purchase %}
+    <div class="col-12"><label class="form-label fw-semibold">Medicine (batch line)</label><select class="form-select" name="medicine_id" required>{% for m in medicines %}<option value="{{ m.id }}">{{ m.name }} — {{ m.batch_number }} (stock {{ m.quantity }})</option>{% endfor %}</select></div>
+    {% endif %}
+    <div class="col-md-4"><label class="form-label fw-semibold">Quantity</label><input class="form-control" type="number" name="quantity" min="1" required value="{{ purchase.quantity if purchase else 1 }}"></div>
+    <div class="col-md-4"><label class="form-label fw-semibold">Unit purchase price ₹</label><input class="form-control" name="purchase_price" required value="{{ purchase.purchase_price if purchase else '' }}"></div>
+  </div>
+  <div class="mt-4">
+    <button type="submit" class="btn btn-primary px-4">{% if purchase %}Save{% else %}Post purchase{% endif %}</button>
+    <a href="{% if purchase %}{{ url_for('admin.purchase_detail', pid=purchase.id) }}{% else %}{{ url_for('admin.purchases') }}{% endif %}" class="btn btn-outline-secondary">Cancel</a>
+  </div>
+</form>
+</div></div></div></div>
+{% endblock %}

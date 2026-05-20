@@ -1,0 +1,70 @@
+{% extends "admin/layout.html" %}
+{% from "admin/_macros.html" import page_heading %}
+{% block breadcrumb %}Inventory · Stock{% endblock %}
+{% block page_title %}Stock control{% endblock %}
+{% block content %}
+{{ page_heading("Warehouse operations", "Adjust quantities, monitor alerts, and purge expired batches.") }}
+<div class="btn-group flex-wrap mb-3" role="group">
+  <a class="btn btn-outline-primary {% if view == 'all' %}active{% endif %}" href="{{ url_for('admin.stock_index') }}">All SKUs</a>
+  <a class="btn btn-outline-warning {% if view == 'low' %}active{% endif %}" href="{{ url_for('admin.stock_low') }}">Low stock</a>
+  <a class="btn btn-outline-secondary {% if view == 'out' %}active{% endif %}" href="{{ url_for('admin.stock_out') }}">Out of stock</a>
+  <a class="btn btn-outline-danger {% if view == 'expired' %}active{% endif %}" href="{{ url_for('admin.stock_expired') }}">Expired</a>
+</div>
+{% if view == 'all' %}
+<form class="row g-2 mb-3" method="get" action="{{ url_for('admin.stock_index') }}">
+  <div class="col-auto"><input class="form-control form-control-sm" name="q" value="{{ q }}" placeholder="Search medicine"></div>
+  <div class="col-auto"><button class="btn btn-sm btn-outline-secondary" type="submit">Filter</button></div>
+</form>
+{% endif %}
+{% if view == 'expired' %}
+<form method="post" action="{{ url_for('admin.stock_remove_expired') }}">
+{% endif %}
+<div class="card card-soft">
+  <div class="table-responsive">
+    <table class="table table-hover align-middle mb-0">
+      <thead><tr>
+        {% if view == 'expired' %}<th style="width:40px"><input type="checkbox" class="form-check-input" onclick="document.querySelectorAll('.exchk').forEach(c=>c.checked=this.checked)" title="Toggle all"></th>{% endif %}
+        <th>Medicine</th><th>Batch</th><th>Expiry</th><th class="text-end">Qty</th><th class="text-end">Min</th><th class="text-end">Value @ cost</th>
+        {% if view == 'all' %}<th colspan="2">Adjustments</th>{% endif %}
+      </tr></thead>
+      <tbody>
+        {% for m in medicines %}
+        <tr>
+          {% if view == 'expired' %}<td><input type="checkbox" class="form-check-input exchk" name="medicine_ids" value="{{ m.id }}" checked></td>{% endif %}
+          <td class="fw-semibold"><a href="{{ url_for('admin.medicine_detail', mid=m.id) }}" class="text-decoration-none">{{ m.name }}</a></td>
+          <td class="small font-monospace text-muted">{{ m.batch_number }}</td>
+          <td class="small">{{ m.expiry_date }}</td>
+          <td class="text-end">{{ m.quantity }}</td>
+          <td class="text-end">{{ m.min_stock_level }}</td>
+          <td class="text-end small">₹ {{ '%.2f'|format((m.quantity * m.purchase_price)|float) }}</td>
+          {% if view == 'all' %}
+          <td>
+            <form class="d-flex gap-1 flex-wrap" method="post" action="{{ url_for('admin.stock_add') }}">
+              <input type="hidden" name="medicine_id" value="{{ m.id }}">
+              <input class="form-control form-control-sm" type="number" name="quantity" min="1" value="10" style="width:72px">
+              <button class="btn btn-sm btn-success" type="submit" title="Add">+</button>
+            </form>
+          </td>
+          <td>
+            <form class="d-flex gap-1 flex-wrap" method="post" action="{{ url_for('admin.stock_update') }}">
+              <input type="hidden" name="medicine_id" value="{{ m.id }}">
+              <input class="form-control form-control-sm" type="number" name="quantity" min="0" value="{{ m.quantity }}" style="width:72px">
+              <button class="btn btn-sm btn-outline-primary" type="submit">Set</button>
+            </form>
+          </td>
+          {% endif %}
+        </tr>
+        {% else %}
+        <tr><td colspan="9"><div class="empty-state">No rows in this view.</div></td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% if view == 'expired' and medicines %}
+  <div class="card-footer bg-transparent border-top-0 pb-3">
+    <button type="submit" class="btn btn-danger" onclick="return confirm('Remove selected expired lines from stock?');"><i class="bi bi-trash me-1"></i> Remove selected</button>
+  </div>
+  {% endif %}
+</div>
+{% if view == 'expired' %}</form>{% endif %}
+{% endblock %}

@@ -1,0 +1,48 @@
+{% extends "staff/layout.html" %}
+{% from "staff/_macros.html" import pagination_nav with context %}
+{% block breadcrumb %}Sales · Returns{% endblock %}
+{% block page_title %}Return history{% endblock %}
+{% block content %}
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+  <p class="text-muted small mb-0">Refunds and restocks you logged against your own bills.</p>
+  <a href="{{ url_for('staff.returns_new') }}" class="btn btn-sm btn-staff-brand"><i class="bi bi-plus-lg me-1"></i>New return</a>
+</div>
+<form class="row g-2 mb-4 align-items-end" method="get" action="{{ url_for('staff.returns_list') }}">
+  <div class="col-auto flex-grow-1" style="min-width:200px;max-width:320px">
+    <label class="form-label small text-muted mb-1">Bill number</label>
+    <input class="form-control form-control-sm" name="bill" value="{{ bill_q }}" placeholder="Filter by BILL-…">
+  </div>
+  <div class="col-auto"><button type="submit" class="btn btn-sm btn-outline-secondary">Filter</button></div>
+  {% if bill_q %}<div class="col-auto"><a href="{{ url_for('staff.returns_list') }}" class="btn btn-sm btn-link text-muted">Clear</a></div>{% endif %}
+</form>
+
+<div class="card card-soft table-responsive">
+  <table class="table table-hover mb-0 align-middle">
+    <thead class="table-light">
+      <tr>
+        <th>When</th>
+        <th>Bill</th>
+        <th>Medicine</th>
+        <th class="text-end">Qty</th>
+        <th class="text-end">Refund</th>
+        <th>Reason</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for r in returns %}
+      <tr>
+        <td class="small text-muted">{{ r.return_date.strftime('%Y-%m-%d %H:%M') }}</td>
+        <td><a href="{{ url_for('staff.bill_detail', bid=r.bill_id) }}" class="text-decoration-none font-monospace small">{{ r.bill.bill_number }}</a></td>
+        <td>{{ r.medicine.name }}</td>
+        <td class="text-end">{{ r.quantity }}</td>
+        <td class="text-end fw-semibold text-success">₹ {{ '%.2f'|format(r.refund_amount|float) }}</td>
+        <td class="small text-muted">{{ r.reason or '—' }}</td>
+      </tr>
+      {% else %}
+      <tr><td colspan="6" class="empty-state">No returns yet. <a href="{{ url_for('staff.returns_new') }}">Record a return</a>.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{{ pagination_nav(pagination) }}
+{% endblock %}

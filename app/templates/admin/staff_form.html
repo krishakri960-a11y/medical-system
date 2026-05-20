@@ -1,0 +1,24 @@
+{% extends "admin/layout.html" %}
+{% from "admin/_macros.html" import page_heading %}
+{% block breadcrumb %}<a href="{{ url_for('admin.staff_users') }}" class="text-muted text-decoration-none">Staff</a> · {% if user %}Edit{% else %}Create{% endif %}{% endblock %}
+{% block page_title %}{% if user %}Edit staff{% else %}New staff{% endif %}{% endblock %}
+{% block content %}
+{{ page_heading("Staff credentials", "Desk users authenticate with the shared login page.") }}
+<div class="row justify-content-center"><div class="col-lg-7">
+<div class="card card-soft"><div class="card-body p-4">
+<form method="post" action="{% if user %}{{ url_for('admin.staff_user_edit', uid=user.id) }}{% else %}{{ url_for('admin.staff_new') }}{% endif %}">
+  {% if not user %}
+  <div class="mb-3"><label class="form-label fw-semibold">Username <span class="text-danger">*</span></label><input class="form-control font-monospace" name="username" required autocomplete="off" placeholder="login id"></div>
+  <div class="mb-3"><label class="form-label fw-semibold">Initial password <span class="text-danger">*</span></label><input type="password" class="form-control" name="password" required minlength="6" autocomplete="new-password"></div>
+  {% else %}
+  <div class="mb-3"><label class="form-label fw-semibold">Username</label><input class="form-control" value="{{ user.username }}" disabled readonly><div class="form-text">Username cannot be changed here.</div></div>
+  <div class="mb-3"><label class="form-label fw-semibold">Reset password</label><input type="password" class="form-control" name="new_password" minlength="6" autocomplete="new-password" placeholder="Leave blank to keep current"></div>
+  {% endif %}
+  <div class="mb-3"><label class="form-label fw-semibold">Full name</label><input class="form-control" name="full_name" required value="{{ user.full_name if user else '' }}"></div>
+  <div class="mb-3"><label class="form-label fw-semibold">Email</label><input type="email" class="form-control" name="email" value="{{ user.email if user else '' }}"></div>
+  <div class="mb-4"><label class="form-label fw-semibold">Phone</label><input class="form-control" name="phone" value="{{ user.phone if user else '' }}"></div>
+  <button type="submit" class="btn btn-primary px-4">{% if user %}Save{% else %}Create account{% endif %}</button>
+  <a href="{% if user %}{{ url_for('admin.staff_user_detail', uid=user.id) }}{% else %}{{ url_for('admin.staff_users') }}{% endif %}" class="btn btn-outline-secondary">Cancel</a>
+</form>
+</div></div></div></div>
+{% endblock %}

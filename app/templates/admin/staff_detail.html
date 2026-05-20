@@ -1,0 +1,54 @@
+{% extends "admin/layout.html" %}
+{% from "admin/_macros.html" import detail_row %}
+{% block breadcrumb %}<a href="{{ url_for('admin.staff_users') }}" class="text-muted text-decoration-none">Staff</a> · Profile{% endblock %}
+{% block page_title %}{{ user.full_name }}{% endblock %}
+{% block content %}
+<div class="d-flex flex-wrap gap-2 mb-3">
+  <a href="{{ url_for('admin.staff_users') }}" class="btn btn-outline-secondary btn-sm">Directory</a>
+  <a href="{{ url_for('admin.staff_user_edit', uid=user.id) }}" class="btn btn-primary btn-sm">Edit profile</a>
+  <form method="post" action="{{ url_for('admin.staff_toggle', uid=user.id) }}" class="d-inline"><button class="btn btn-{% if user.is_active %}outline-warning{% else %}outline-success{% endif %} btn-sm" type="submit">{% if user.is_active %}Deactivate{% else %}Activate{% endif %}</button></form>
+  {% if bill_count == 0 %}
+  <form method="post" action="{{ url_for('admin.staff_delete', uid=user.id) }}" class="d-inline" onsubmit="return confirm('Permanently delete user?');"><button class="btn btn-outline-danger btn-sm" type="submit">Delete</button></form>
+  {% endif %}
+</div>
+<div class="row g-3">
+  <div class="col-lg-4">
+    <div class="card card-soft detail-card">
+      <div class="card-header">Account</div>
+      <div class="card-body p-0">
+        {{ detail_row("User ID", "#" ~ user.id) }}
+        {{ detail_row("Username", user.username) }}
+        {{ detail_row("Status", "Active" if user.is_active else "Disabled") }}
+        {{ detail_row("Registered", user.created_at.strftime('%Y-%m-%d') if user.created_at else "—") }}
+      </div>
+    </div>
+  </div>
+  <div class="col-lg-4">
+    <div class="card card-soft detail-card">
+      <div class="card-header">Contact</div>
+      <div class="card-body p-0">
+        {{ detail_row("Full name", user.full_name) }}
+        {{ detail_row("Email", user.email or "—") }}
+        {{ detail_row("Phone", user.phone or "—") }}
+      </div>
+    </div>
+  </div>
+  <div class="col-lg-4">
+    <div class="card card-soft p-3">
+      <div class="small text-muted">Sales performance</div>
+      <div class="fs-5 fw-bold">₹ {{ '%.2f'|format(bill_total|float) }}</div>
+      <div class="small">{{ bill_count }} bill(s) · {{ return_count }} return(s)</div>
+    </div>
+  </div>
+</div>
+<div class="card card-soft detail-card mt-3">
+  <div class="card-header">Recent bills issued</div>
+  <div class="table-responsive">
+    <table class="table table-sm mb-0"><thead><tr><th>Date</th><th>Bill</th><th>Customer</th><th class="text-end">Total</th><th></th></tr></thead>
+    <tbody>
+      {% for b in bills %}<tr><td>{{ b.created_at.strftime('%Y-%m-%d') }}</td><td>{{ b.bill_number }}</td><td>{{ b.customer.name }}</td><td class="text-end">₹ {{ '%.2f'|format(b.grand_total|float) }}</td><td><a href="{{ url_for('admin.bill_detail', bid=b.id) }}">View</a></td></tr>
+      {% else %}<tr><td colspan="5" class="text-muted p-3">No sales.</td></tr>{% endfor %}
+    </tbody></table>
+  </div>
+</div>
+{% endblock %}

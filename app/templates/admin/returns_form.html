@@ -1,0 +1,52 @@
+{% extends "admin/layout.html" %}
+{% block page_title %}New return{% endblock %}
+{% block content %}
+<div class="card card-soft p-4" style="max-width:640px">
+  <form method="post" id="retForm">
+    <div class="mb-3">
+      <label class="form-label">Bill</label>
+      <select class="form-select" name="bill_id" id="billId" required>
+        {% for b in bills %}<option value="{{ b.id }}">{{ b.bill_number }} — {{ b.customer.name }} — ₹ {{ b.grand_total }}</option>{% endfor %}
+      </select>
+    </div>
+    <div class="mb-3">
+      <label class="form-label">Medicine line</label>
+      <select class="form-select" name="medicine_id" id="medId" required></select>
+    </div>
+    <div class="mb-3">
+      <label class="form-label">Quantity</label>
+      <input type="number" class="form-control" name="quantity" id="retQty" min="1" value="1" required>
+    </div>
+    <div class="mb-3">
+      <label class="form-label">Reason</label>
+      <input class="form-control" name="reason" placeholder="Optional">
+    </div>
+    <button type="submit" class="btn btn-primary">Submit return</button>
+    <a href="{{ url_for('admin.returns_list') }}" class="btn btn-outline-secondary">Cancel</a>
+  </form>
+</div>
+{% endblock %}
+{% block scripts %}
+<script>
+(function(){
+  function loadLines(){
+    const bid = document.getElementById('billId').value;
+    const sel = document.getElementById('medId');
+    sel.innerHTML = '';
+    if(!bid) return;
+    const urlT = "{{ url_for('admin.api_bill_lines', bid=987654321) }}";
+    fetch(urlT.replace('987654321', bid)).then(r=>r.json()).then(data=>{
+      data.forEach(function(l){
+        const o = document.createElement('option');
+        o.value = l.medicine_id;
+        o.textContent = l.name + ' (max ' + l.max_qty + ')';
+        o.dataset.max = l.max_qty;
+        sel.appendChild(o);
+      });
+    });
+  }
+  document.getElementById('billId').addEventListener('change', loadLines);
+  loadLines();
+})();
+</script>
+{% endblock %}

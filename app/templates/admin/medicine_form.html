@@ -1,0 +1,33 @@
+{% extends "admin/layout.html" %}
+{% from "admin/_macros.html" import page_heading %}
+{% block breadcrumb %}<a href="{{ url_for('admin.medicines') }}" class="text-muted text-decoration-none">Medicines</a> · {% if medicine %}Edit{% else %}Create{% endif %}{% endblock %}
+{% block page_title %}{% if medicine %}Edit batch line{% else %}New batch line{% endif %}{% endblock %}
+{% block content %}
+{{ page_heading("Medicine & batch", "Pricing and quantity for this specific manufacturing batch.") }}
+<div class="row justify-content-center"><div class="col-lg-10">
+<div class="card card-soft"><div class="card-body p-4">
+<form method="post" action="{% if medicine %}{{ url_for('admin.medicine_edit', mid=medicine.id) }}{% else %}{{ url_for('admin.medicine_new') }}{% endif %}">
+  <div class="row g-3">
+    <div class="col-12"><h6 class="text-primary border-bottom pb-2 mb-3">Identification</h6></div>
+    <div class="col-md-8"><label class="form-label fw-semibold">Medicine name <span class="text-danger">*</span></label><input class="form-control" name="name" required value="{{ medicine.name if medicine else '' }}"></div>
+    <div class="col-md-4"><label class="form-label fw-semibold">Batch <span class="text-danger">*</span></label><input class="form-control font-monospace" name="batch_number" required value="{{ medicine.batch_number if medicine else '' }}"></div>
+    <div class="col-md-4"><label class="form-label fw-semibold">Brand</label><select class="form-select" name="brand_id" required>{% for b in brands %}<option value="{{ b.id }}" {% if medicine and medicine.brand_id == b.id %}selected{% elif not medicine and prefill.brand_id == b.id %}selected{% endif %}>{{ b.name }}</option>{% endfor %}</select></div>
+    <div class="col-md-4"><label class="form-label fw-semibold">Category</label><select class="form-select" name="category_id" required>{% for c in categories %}<option value="{{ c.id }}" {% if medicine and medicine.category_id == c.id %}selected{% elif not medicine and prefill.category_id == c.id %}selected{% endif %}>{{ c.name }}</option>{% endfor %}</select></div>
+    <div class="col-md-4"><label class="form-label fw-semibold">Supplier</label><select class="form-select" name="supplier_id" required>{% for s in suppliers %}<option value="{{ s.id }}" {% if medicine and medicine.supplier_id == s.id %}selected{% elif not medicine and prefill.supplier_id == s.id %}selected{% endif %}>{{ s.name }}</option>{% endfor %}</select></div>
+    <div class="col-12 mt-2"><h6 class="text-primary border-bottom pb-2 mb-3">Dates &amp; stock</h6></div>
+    <div class="col-md-3"><label class="form-label fw-semibold">Manufacturing</label><input class="form-control" type="date" name="manufacturing_date" required value="{{ medicine.manufacturing_date if medicine else '' }}"></div>
+    <div class="col-md-3"><label class="form-label fw-semibold">Expiry</label><input class="form-control" type="date" name="expiry_date" required value="{{ medicine.expiry_date if medicine else '' }}"></div>
+    <div class="col-md-2"><label class="form-label fw-semibold">Quantity</label><input class="form-control" type="number" name="quantity" min="0" required value="{{ medicine.quantity if medicine else 0 }}"></div>
+    <div class="col-md-2"><label class="form-label fw-semibold">Min. alert</label><input class="form-control" type="number" name="min_stock_level" min="0" required value="{{ medicine.min_stock_level if medicine else 10 }}"></div>
+    <div class="col-12 mt-2"><h6 class="text-primary border-bottom pb-2 mb-3">Commercial</h6></div>
+    <div class="col-md-4"><label class="form-label fw-semibold">Purchase ₹</label><input class="form-control" name="purchase_price" required value="{{ medicine.purchase_price if medicine else '' }}"></div>
+    <div class="col-md-4"><label class="form-label fw-semibold">Selling ₹</label><input class="form-control" name="selling_price" required value="{{ medicine.selling_price if medicine else '' }}"></div>
+    <div class="col-md-12"><label class="form-label fw-semibold">Description</label><textarea class="form-control" name="description" rows="2">{{ medicine.description if medicine else '' }}</textarea></div>
+  </div>
+  <div class="mt-4 d-flex gap-2 flex-wrap">
+    <button type="submit" class="btn btn-primary px-4">{% if medicine %}Save{% else %}Create{% endif %}</button>
+    <a href="{% if medicine %}{{ url_for('admin.medicine_detail', mid=medicine.id) }}{% else %}{{ url_for('admin.medicines') }}{% endif %}" class="btn btn-outline-secondary">Cancel</a>
+  </div>
+</form>
+</div></div></div></div>
+{% endblock %}

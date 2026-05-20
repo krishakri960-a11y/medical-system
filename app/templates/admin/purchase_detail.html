@@ -1,0 +1,26 @@
+{% extends "admin/layout.html" %}
+{% from "admin/_macros.html" import detail_row %}
+{% block breadcrumb %}<a href="{{ url_for('admin.purchases') }}" class="text-muted text-decoration-none">Purchases</a> · Entry{% endblock %}
+{% block page_title %}Purchase #{{ purchase.id }}{% endblock %}
+{% block content %}
+<div class="d-flex flex-wrap gap-2 mb-3">
+  <a href="{{ url_for('admin.purchases') }}" class="btn btn-outline-secondary btn-sm">Register</a>
+  <a href="{{ url_for('admin.purchase_edit', pid=purchase.id) }}" class="btn btn-primary btn-sm">Edit</a>
+  <form method="post" action="{{ url_for('admin.purchase_delete', pid=purchase.id) }}" class="d-inline" onsubmit="return confirm('Reverse this purchase and reduce stock?');"><button class="btn btn-outline-danger btn-sm" type="submit">Delete</button></form>
+</div>
+<div class="row g-3"><div class="col-lg-6">
+<div class="card card-soft detail-card">
+  <div class="card-header">Commercial detail</div>
+  <div class="card-body p-0">
+    {{ detail_row("Entry ID", "#" ~ purchase.id) }}
+    {{ detail_row("Purchase date", purchase.purchase_date) }}
+    {{ detail_row("Supplier", purchase.supplier.name ~ (' · ' ~ purchase.supplier.company_name if purchase.supplier.company_name else '')) }}
+    {{ detail_row("Medicine", purchase.medicine_name) }}
+    {{ detail_row("Batch", purchase.batch_number) }}
+    {{ detail_row("Quantity received", purchase.quantity) }}
+    {{ detail_row("Unit cost", "₹ " ~ '%.2f'|format(purchase.purchase_price|float)) }}
+    {{ detail_row("Line total", "₹ " ~ '%.2f'|format(purchase.total_amount|float)) }}
+    {% if purchase.medicine %}<div class="p-3 border-top bg-light"><a href="{{ url_for('admin.medicine_detail', mid=purchase.medicine_id) }}">Open linked inventory line →</a></div>{% endif %}
+  </div>
+</div></div></div>
+{% endblock %}

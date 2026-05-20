@@ -1,0 +1,53 @@
+{% extends "staff/layout.html" %}
+{% block breadcrumb %}Sales · Billing{% endblock %}
+{% block page_title %}Bill {{ bill.bill_number }}{% endblock %}
+{% block content %}
+<div class="card card-soft p-4">
+  <div class="row mb-4">
+    <div class="col-md-6">
+      <div class="text-muted small text-uppercase fw-semibold mb-1" style="letter-spacing:0.05em">Bill</div>
+      <div class="fs-5 fw-bold">{{ bill.bill_number }}</div>
+      <div class="small text-muted">{{ bill.created_at.strftime('%A, %d %B %Y · %H:%M') }}</div>
+    </div>
+    <div class="col-md-6 text-md-end mt-3 mt-md-0">
+      <div class="text-muted small text-uppercase fw-semibold mb-1" style="letter-spacing:0.05em">Customer</div>
+      <div class="fw-semibold">{{ bill.customer.name }}</div>
+      <div class="small text-muted">{{ bill.customer.contact_number or '' }} {{ bill.customer.email or '' }}</div>
+    </div>
+  </div>
+
+  <div class="table-responsive mb-4">
+    <table class="table table-sm align-middle">
+      <thead class="table-light"><tr><th>Medicine</th><th class="text-end">Qty</th><th class="text-end">Rate</th><th class="text-end">Line total</th></tr></thead>
+      <tbody>
+        {% for li in bill.items %}
+        <tr>
+          <td>{{ li.medicine.name }} <span class="small text-muted">({{ li.medicine.batch_number }})</span></td>
+          <td class="text-end">{{ li.quantity }}</td>
+          <td class="text-end">₹ {{ '%.2f'|format(li.unit_price|float) }}</td>
+          <td class="text-end fw-semibold">₹ {{ '%.2f'|format(li.line_total|float) }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <div class="row justify-content-end mb-4">
+    <div class="col-md-5 col-lg-4">
+      <div class="d-flex justify-content-between small"><span class="text-muted">Subtotal</span><span>₹ {{ '%.2f'|format(bill.subtotal|float) }}</span></div>
+      <div class="d-flex justify-content-between small"><span class="text-muted">Discount</span><span>₹ {{ '%.2f'|format(bill.discount_amount|float) }}</span></div>
+      <div class="d-flex justify-content-between small"><span class="text-muted">Tax</span><span>₹ {{ '%.2f'|format(bill.tax_amount|float) }}</span></div>
+      <hr class="my-2">
+      <div class="d-flex justify-content-between fw-bold"><span>Grand total</span><span class="text-success">₹ {{ '%.2f'|format(bill.grand_total|float) }}</span></div>
+    </div>
+  </div>
+
+  {% if bill.notes %}<p class="small text-muted border-start border-3 border-secondary ps-3 mb-4">{{ bill.notes }}</p>{% endif %}
+
+  <div class="d-flex flex-wrap gap-2">
+    <a href="{{ url_for('staff.bill_print', bid=bill.id) }}" class="btn btn-staff-brand"><i class="bi bi-printer me-1"></i>Print receipt</a>
+    <a href="{{ url_for('staff.sales') }}" class="btn btn-outline-secondary">Back to my sales</a>
+    <a href="{{ url_for('staff.customer_detail', cid=bill.customer_id) }}" class="btn btn-outline-secondary">Customer profile</a>
+  </div>
+</div>
+{% endblock %}

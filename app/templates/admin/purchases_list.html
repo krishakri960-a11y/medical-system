@@ -1,0 +1,37 @@
+{% extends "admin/layout.html" %}
+{% from "admin/_macros.html" import page_heading, pagination_nav with context %}
+{% block breadcrumb %}Procurement · Purchases{% endblock %}
+{% block page_title %}Purchase register{% endblock %}
+{% block content %}
+{{ page_heading("Goods received", "Stock increments with supplier and audit trail.") }}
+<div class="page-action-bar">
+  <form class="row g-2 align-items-end flex-grow-1" method="get">
+    <div class="col-auto"><label class="small text-muted">Supplier</label><select class="form-select form-select-sm" name="supplier_id"><option value="">Any</option>{% for s in suppliers %}<option value="{{ s.id }}" {% if supplier_id == s.id %}selected{% endif %}>{{ s.name }}</option>{% endfor %}</select></div>
+    <div class="col-auto"><label class="small text-muted">From</label><input type="date" class="form-control form-control-sm" name="date_from" value="{{ date_from or '' }}"></div>
+    <div class="col-auto"><label class="small text-muted">To</label><input type="date" class="form-control form-control-sm" name="date_to" value="{{ date_to or '' }}"></div>
+    <div class="col-auto"><button type="submit" class="btn btn-sm btn-outline-primary">Filter</button></div>
+  </form>
+  <a href="{{ url_for('admin.purchase_new') }}" class="btn btn-brand"><i class="bi bi-plus-lg me-1"></i> New entry</a>
+</div>
+<div class="card card-soft table-responsive">
+  <table class="table table-hover align-middle mb-0">
+    <thead><tr><th>ID</th><th>Date</th><th>Supplier</th><th>Medicine / Batch</th><th class="text-end">Qty</th><th class="text-end">Total ₹</th><th class="text-end">Actions</th></tr></thead>
+    <tbody>
+      {% for p in purchases %}
+      <tr>
+        <td class="small text-muted">#{{ p.id }}</td>
+        <td>{{ p.purchase_date }}</td>
+        <td class="small">{{ p.supplier.name }}</td>
+        <td><div class="fw-semibold">{{ p.medicine_name }}</div><div class="small text-muted font-monospace">{{ p.batch_number }}</div></td>
+        <td class="text-end">{{ p.quantity }}</td>
+        <td class="text-end fw-semibold">₹ {{ '%.2f'|format(p.total_amount|float) }}</td>
+        <td class="text-end"><a href="{{ url_for('admin.purchase_detail', pid=p.id) }}" class="btn btn-sm btn-outline-secondary">View</a> <a href="{{ url_for('admin.purchase_edit', pid=p.id) }}" class="btn btn-sm btn-outline-primary">Edit</a></td>
+      </tr>
+      {% else %}
+      <tr><td colspan="7"><div class="empty-state">No purchases. <a href="{{ url_for('admin.purchase_new') }}">Create entry</a>.</div></td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {{ pagination_nav(pagination) }}
+</div>
+{% endblock %}

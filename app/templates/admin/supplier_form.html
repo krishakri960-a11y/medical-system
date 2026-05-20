@@ -1,0 +1,23 @@
+{% extends "admin/layout.html" %}
+{% from "admin/_macros.html" import page_heading %}
+{% block breadcrumb %}<a href="{{ url_for('admin.suppliers') }}" class="text-muted text-decoration-none">Suppliers</a> · {% if supplier %}Edit{% else %}New{% endif %}{% endblock %}
+{% block page_title %}{% if supplier %}Edit supplier{% else %}New supplier{% endif %}{% endblock %}
+{% block content %}
+{{ page_heading("Supplier master", "Contact data used on purchase orders and GRN records.") }}
+<div class="row justify-content-center"><div class="col-lg-8">
+<div class="card card-soft"><div class="card-body p-4">
+<form method="post" action="{% if supplier %}{{ url_for('admin.supplier_edit', sid=supplier.id) }}{% else %}{{ url_for('admin.supplier_new') }}{% endif %}">
+  <div class="row g-3">
+    <div class="col-md-6"><label class="form-label fw-semibold">Supplier name <span class="text-danger">*</span></label><input class="form-control" name="name" required value="{{ supplier.name if supplier else '' }}" placeholder="Primary vendor name"></div>
+    <div class="col-md-6"><label class="form-label fw-semibold">Company / legal name</label><input class="form-control" name="company_name" value="{{ supplier.company_name if supplier else '' }}"></div>
+    <div class="col-md-6"><label class="form-label fw-semibold">Contact number</label><input class="form-control" name="contact_number" value="{{ supplier.contact_number if supplier else '' }}"></div>
+    <div class="col-md-6"><label class="form-label fw-semibold">Email</label><input type="email" class="form-control" name="email" value="{{ supplier.email if supplier else '' }}"></div>
+    <div class="col-12"><label class="form-label fw-semibold">Address</label><textarea class="form-control" name="address" rows="2" placeholder="Billing / warehouse address">{{ supplier.address if supplier else '' }}</textarea></div>
+  </div>
+  <div class="mt-4">
+    <button type="submit" class="btn btn-primary px-4">{% if supplier %}Update supplier{% else %}Save supplier{% endif %}</button>
+    <a href="{% if supplier %}{{ url_for('admin.supplier_detail', sid=supplier.id) }}{% else %}{{ url_for('admin.suppliers') }}{% endif %}" class="btn btn-outline-secondary">Cancel</a>
+  </div>
+</form>
+</div></div></div></div>
+{% endblock %}

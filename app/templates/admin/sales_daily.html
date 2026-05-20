@@ -1,0 +1,13 @@
+{% extends "admin/layout.html" %}
+{% block page_title %}Daily sales{% endblock %}
+{% block content %}
+<form class="row g-2 mb-3" method="get"><div class="col-auto"><input type="date" class="form-control" name="day" value="{{ day }}"></div><div class="col-auto"><button class="btn btn-primary" type="submit">Go</button></div><div class="col-auto align-self-center"><a href="{{ url_for('admin.sales') }}" class="btn btn-outline-secondary btn-sm">All sales</a></div></form>
+<div class="alert alert-info">Total for {{ day }}: <strong>₹ {{ '%.2f'|format(total|float) }}</strong></div>
+<div class="card card-soft table-responsive">
+  <table class="table mb-0"><thead><tr><th>Bill</th><th>Customer</th><th class="text-end">Total</th></tr></thead>
+  <tbody>
+    {% for b in bills %}<tr><td>{{ b.bill_number }}</td><td>{{ b.customer.name }}</td><td class="text-end">₹ {{ '%.2f'|format(b.grand_total|float) }}</td></tr>
+    {% else %}<tr><td colspan="3" class="text-muted">No bills.</td></tr>{% endfor %}
+  </tbody></table>
+</div>
+{% endblock %}

@@ -1,0 +1,39 @@
+{% extends "admin/layout.html" %}
+{% from "admin/_macros.html" import page_heading, pagination_nav with context %}
+{% block breadcrumb %}Sales · Billing{% endblock %}
+{% block page_title %}Invoice register{% endblock %}
+{% block content %}
+{{ page_heading("Tax invoices & bills", "Search historical tickets or open the POS builder.") }}
+<div class="page-action-bar">
+  <form class="row g-2 align-items-end" method="get">
+    <div class="col-auto"><label class="small text-muted">Bill #</label><input class="form-control form-control-sm" name="bill" value="{{ q_bill }}" placeholder="BILL-…"></div>
+    <div class="col-auto"><button type="submit" class="btn btn-sm btn-outline-primary">Search</button>{% if q_bill %}<a href="{{ url_for('admin.billing_list') }}" class="btn btn-sm btn-link">Reset</a>{% endif %}</div>
+  </form>
+  <a href="{{ url_for('admin.billing_new') }}" class="btn btn-brand"><i class="bi bi-plus-lg me-1"></i> New bill</a>
+</div>
+<div class="card card-soft">
+  <div class="table-responsive">
+    <table class="table table-hover align-middle mb-0">
+      <thead><tr><th>Bill #</th><th>Date &amp; time</th><th>Customer</th><th>Cashier</th><th class="text-end">Grand total</th><th class="text-end">Actions</th></tr></thead>
+      <tbody>
+        {% for b in bills %}
+        <tr>
+          <td class="fw-semibold font-monospace">{{ b.bill_number }}</td>
+          <td class="small">{{ b.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
+          <td><a href="{{ url_for('admin.customer_detail', cid=b.customer_id) }}">{{ b.customer.name }}</a></td>
+          <td>{{ b.staff.full_name }}</td>
+          <td class="text-end fw-semibold">₹ {{ '%.2f'|format(b.grand_total|float) }}</td>
+          <td class="text-end">
+            <a class="btn btn-sm btn-outline-secondary" href="{{ url_for('admin.bill_print', bid=b.id) }}">Print</a>
+            <a class="btn btn-sm btn-primary" href="{{ url_for('admin.bill_detail', bid=b.id) }}">Detail</a>
+          </td>
+        </tr>
+        {% else %}
+        <tr><td colspan="6"><div class="empty-state">No bills match.</div></td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {{ pagination_nav(pagination) }}
+</div>
+{% endblock %}

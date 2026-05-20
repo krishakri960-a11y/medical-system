@@ -1,0 +1,34 @@
+{% extends "admin/layout.html" %}
+{% from "admin/_macros.html" import page_heading, toolbar_search, action_group, pagination_nav with context %}
+{% block breadcrumb %}Master data · Brands{% endblock %}
+{% block page_title %}Brands{% endblock %}
+{% block content %}
+{{ page_heading("Brand registry", "Manage pharmaceutical brand names linked to inventory batches.") }}
+<div class="page-action-bar">
+  {{ toolbar_search(url_for('admin.brands'), 'Search brands…', q) }}
+  <a href="{{ url_for('admin.brand_new') }}" class="btn btn-brand"><i class="bi bi-plus-lg me-1"></i> New brand</a>
+</div>
+<div class="card card-soft">
+  <div class="table-responsive">
+    <table class="table table-hover align-middle mb-0">
+      <thead><tr><th>ID</th><th>Name</th><th>Description</th><th class="text-end">SKUs</th><th class="text-end" width="140">Actions</th></tr></thead>
+      <tbody>
+        {% for b in brands %}
+        <tr>
+          <td class="text-muted small">#{{ b.id }}</td>
+          <td class="fw-semibold">{{ b.name }}</td>
+          <td class="text-muted small">{% if b.description %}{{ b.description[:80] }}{% if b.description|length > 80 %}…{% endif %}{% else %}—{% endif %}</td>
+          <td class="text-end"><span class="badge bg-light text-dark border">{{ b.medicines.count() }}</span></td>
+          <td class="text-end">
+            {{ action_group(url_for('admin.brand_detail', bid=b.id), url_for('admin.brand_edit', bid=b.id), url_for('admin.brand_delete', bid=b.id) if b.medicines.count() == 0 else None, 'Delete brand ' + b.name + '?') }}
+          </td>
+        </tr>
+        {% else %}
+        <tr><td colspan="5"><div class="empty-state">No brands found. <a href="{{ url_for('admin.brand_new') }}">Create the first brand</a>.</div></td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {{ pagination_nav(pagination) }}
+</div>
+{% endblock %}

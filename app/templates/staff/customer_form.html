@@ -1,0 +1,39 @@
+{% extends "staff/layout.html" %}
+{% block breadcrumb %}Sales · Customers{% if customer %} · <a href="{{ url_for('staff.customer_detail', cid=customer.id) }}" class="text-muted text-decoration-none">{{ customer.name }}</a>{% endif %}{% endblock %}
+{% block page_title %}{% if customer %}Edit customer{% else %}New customer{% endif %}{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-lg-7">
+    <div class="card card-soft p-4">
+      <form method="post">
+        <div class="mb-3">
+          <label class="form-label">Full name <span class="text-danger">*</span></label>
+          <input class="form-control" name="name" required value="{{ customer.name if customer else '' }}" placeholder="Patient / buyer name">
+        </div>
+        <div class="row g-3">
+          <div class="col-md-6">
+            <label class="form-label">Phone</label>
+            <input class="form-control" name="contact_number" value="{{ customer.contact_number if customer else '' }}" placeholder="Mobile or landline">
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Email</label>
+            <input type="email" class="form-control" name="email" value="{{ customer.email if customer else '' }}" placeholder="optional">
+          </div>
+        </div>
+        <div class="mb-4 mt-3">
+          <label class="form-label">Address</label>
+          <textarea class="form-control" name="address" rows="3" placeholder="Street, area, city…">{{ customer.address if customer else '' }}</textarea>
+        </div>
+        <div class="d-flex flex-wrap gap-2">
+          <button type="submit" class="btn btn-staff-brand">{% if customer %}Save changes{% else %}Create customer{% endif %}</button>
+          {% if customer %}
+          <a href="{{ url_for('staff.customer_detail', cid=customer.id) }}" class="btn btn-outline-secondary">Cancel</a>
+          {% else %}
+          <a href="{{ url_for('staff.customers') }}" class="btn btn-outline-secondary">Cancel</a>
+          {% endif %}
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

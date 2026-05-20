@@ -1,0 +1,54 @@
+{% extends "admin/layout.html" %}
+{% from "admin/_macros.html" import detail_row %}
+{% block breadcrumb %}<a href="{{ url_for('admin.suppliers') }}" class="text-muted text-decoration-none">Suppliers</a> · Profile{% endblock %}
+{% block page_title %}{{ supplier.name }}{% endblock %}
+{% block content %}
+<div class="d-flex flex-wrap gap-2 mb-3">
+  <a href="{{ url_for('admin.suppliers') }}" class="btn btn-outline-secondary btn-sm"><i class="bi bi-arrow-left"></i> Directory</a>
+  <a href="{{ url_for('admin.supplier_edit', sid=supplier.id) }}" class="btn btn-primary btn-sm"><i class="bi bi-pencil"></i> Edit</a>
+  <a href="{{ url_for('admin.purchase_new') }}" class="btn btn-outline-primary btn-sm"><i class="bi bi-cart-plus"></i> Record purchase</a>
+  {% if med_count == 0 %}
+  <form method="post" action="{{ url_for('admin.supplier_delete', sid=supplier.id) }}" class="d-inline" onsubmit="return confirm('Delete supplier?');"><button type="submit" class="btn btn-outline-danger btn-sm">Delete</button></form>
+  {% endif %}
+</div>
+<div class="row g-3">
+  <div class="col-lg-4">
+    <div class="card card-soft detail-card">
+      <div class="card-header">Registered details</div>
+      <div class="card-body p-0">
+        {{ detail_row("Supplier ID", "#" ~ supplier.id) }}
+        {{ detail_row("Trading name", supplier.name) }}
+        {{ detail_row("Legal company", supplier.company_name or "—") }}
+        {{ detail_row("Phone", supplier.contact_number or "—") }}
+        {{ detail_row("Email", supplier.email or "—") }}
+        {{ detail_row("Address", supplier.address or "—") }}
+        {{ detail_row("Active SKUs", med_count) }}
+        {{ detail_row("Purchase entries", purchase_count) }}
+      </div>
+    </div>
+  </div>
+  <div class="col-lg-8">
+    <div class="card card-soft detail-card mb-3">
+      <div class="card-header">Recent procurement</div>
+      <div class="table-responsive">
+        <table class="table table-sm mb-0"><thead><tr><th>Date</th><th>Medicine</th><th>Qty</th><th class="text-end">Total</th><th></th></tr></thead>
+        <tbody>
+          {% for p in purchases %}
+          <tr><td>{{ p.purchase_date }}</td><td>{{ p.medicine_name }}</td><td>{{ p.quantity }}</td><td class="text-end">₹ {{ '%.2f'|format(p.total_amount|float) }}</td><td><a href="{{ url_for('admin.purchase_detail', pid=p.id) }}">View</a></td></tr>
+          {% else %}<tr><td colspan="5" class="text-muted p-3">No purchases logged.</td></tr>{% endfor %}
+        </tbody></table>
+      </div>
+    </div>
+    <div class="card card-soft detail-card">
+      <div class="card-header d-flex justify-content-between"><span>Stock lines from this supplier</span><a href="{{ url_for('admin.medicine_new', supplier_id=supplier.id) }}" class="btn btn-sm btn-outline-primary">Add line</a></div>
+      <div class="table-responsive">
+        <table class="table table-sm mb-0"><thead><tr><th>Medicine</th><th>Batch</th><th>Qty</th><th></th></tr></thead>
+        <tbody>
+          {% for m in medicines %}<tr><td>{{ m.name }}</td><td>{{ m.batch_number }}</td><td>{{ m.quantity }}</td><td><a href="{{ url_for('admin.medicine_detail', mid=m.id) }}">View</a></td></tr>
+          {% else %}<tr><td colspan="4" class="text-muted p-3">None.</td></tr>{% endfor %}
+        </tbody></table>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,5 @@
+{% extends "admin/layout.html" %}{% block page_title %}Report · Purchases{% endblock %}{% block content %}
+<button class="btn btn-sm btn-primary mb-3 no-print float-end" onclick="window.print()">Print</button>
+<div class="card card-soft table-responsive"><table class="table table-sm mb-0"><thead><tr><th>Date</th><th>Supplier</th><th>Medicine</th><th>Qty</th><th>Total</th></tr></thead><tbody>
+{% for p in rows %}<tr><td>{{ p.purchase_date }}</td><td>{{ p.supplier.name }}</td><td>{{ p.medicine_name }}</td><td>{{ p.quantity }}</td><td>₹ {{ '%.2f'|format(p.total_amount|float) }}</td></tr>{% else %}<tr><td colspan="5">None.</td></tr>{% endfor %}
+</tbody></table></div>{% endblock %}

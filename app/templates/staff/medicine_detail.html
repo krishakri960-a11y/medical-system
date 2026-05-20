@@ -1,0 +1,47 @@
+{% extends "staff/layout.html" %}
+{% from "staff/_macros.html" import badge_stock, detail_row with context %}
+{% block breadcrumb %}Inventory · <a href="{{ url_for('staff.medicines') }}" class="text-muted text-decoration-none">Medicines</a>{% endblock %}
+{% block page_title %}{{ medicine.name }}{% endblock %}
+{% block content %}
+<div class="row g-4">
+  <div class="col-lg-8">
+    <div class="card card-soft p-4">
+      <div class="d-flex flex-wrap justify-content-between gap-2 mb-3">
+        <div>
+          <span class="me-2">{{ badge_stock(medicine) }}</span>
+          <span class="small text-muted font-monospace">{{ medicine.batch_number }}</span>
+        </div>
+        <a href="{{ url_for('staff.stock') }}" class="btn btn-sm btn-outline-secondary">Back to stock</a>
+      </div>
+      <div class="border rounded-3 overflow-hidden">
+        {{ detail_row("Name", medicine.name) }}
+        {{ detail_row("Brand", medicine.brand.name) }}
+        {{ detail_row("Category", medicine.category.name) }}
+        {{ detail_row("Supplier", medicine.supplier.name) }}
+        {{ detail_row("Manufacturing", medicine.manufacturing_date) }}
+        {{ detail_row("Expiry", medicine.expiry_date) }}
+        {{ detail_row("Quantity on hand", medicine.quantity) }}
+        {{ detail_row("Minimum stock", medicine.min_stock_level) }}
+        {{ detail_row("Purchase price", "₹ " ~ ('%.2f'|format(medicine.purchase_price|float))) }}
+        {{ detail_row("Selling price", "₹ " ~ ('%.2f'|format(medicine.selling_price|float))) }}
+        {% if medicine.description %}
+        <div class="row py-2 px-1">
+          <div class="col-sm-4 text-muted small fw-semibold text-uppercase pt-1" style="letter-spacing:0.03em">Notes</div>
+          <div class="col-sm-8"><p class="mb-0 small">{{ medicine.description }}</p></div>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+  <div class="col-lg-4">
+    <div class="card card-soft p-4">
+      <h3 class="h6 text-muted text-uppercase fw-semibold mb-3" style="letter-spacing:0.05em">At a glance</h3>
+      <ul class="list-unstyled small mb-0">
+        <li class="mb-2"><i class="bi bi-info-circle me-2 text-secondary"></i>Reference only—editing is handled in admin.</li>
+        <li class="mb-2"><i class="bi bi-receipt me-2 text-secondary"></i>Use <a href="{{ url_for('staff.billing') }}">billing</a> to sell from available stock.</li>
+        <li><i class="bi bi-arrow-return-left me-2 text-secondary"></i>Returns restock this SKU when linked to your bill.</li>
+      </ul>
+    </div>
+  </div>
+</div>
+{% endblock %}

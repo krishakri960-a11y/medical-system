@@ -1,0 +1,41 @@
+{% extends "admin/layout.html" %}
+{% from "admin/_macros.html" import detail_row %}
+{% block breadcrumb %}<a href="{{ url_for('admin.categories') }}" class="text-muted text-decoration-none">Categories</a> · Detail{% endblock %}
+{% block page_title %}{{ category.name }}{% endblock %}
+{% block content %}
+<div class="d-flex flex-wrap gap-2 mb-3">
+  <a href="{{ url_for('admin.categories') }}" class="btn btn-outline-secondary btn-sm"><i class="bi bi-arrow-left"></i> Back</a>
+  <a href="{{ url_for('admin.category_edit', cid=category.id) }}" class="btn btn-primary btn-sm"><i class="bi bi-pencil"></i> Edit</a>
+  {% if med_count == 0 %}
+  <form method="post" action="{{ url_for('admin.category_delete', cid=category.id) }}" class="d-inline" onsubmit="return confirm('Delete category?');"><button class="btn btn-outline-danger btn-sm" type="submit"><i class="bi bi-trash"></i> Delete</button></form>
+  {% endif %}
+</div>
+<div class="row g-3">
+  <div class="col-lg-4">
+    <div class="card card-soft detail-card">
+      <div class="card-header">Category</div>
+      <div class="card-body p-0">
+        {{ detail_row("ID", "#" ~ category.id) }}
+        {{ detail_row("Name", category.name) }}
+        {{ detail_row("Description", category.description or "—") }}
+        {{ detail_row("SKU count", med_count) }}
+      </div>
+    </div>
+  </div>
+  <div class="col-lg-8">
+    <div class="card card-soft detail-card">
+      <div class="card-header d-flex justify-content-between">
+        <span>Medicines in category</span>
+        <a href="{{ url_for('admin.medicine_new', category_id=category.id) }}" class="btn btn-sm btn-outline-primary">New line</a>
+      </div>
+      <div class="table-responsive">
+        <table class="table table-sm mb-0"><thead><tr><th>Name</th><th>Batch</th><th>Qty</th><th></th></tr></thead>
+        <tbody>
+          {% for m in medicines %}<tr><td>{{ m.name }}</td><td>{{ m.batch_number }}</td><td>{{ m.quantity }}</td><td><a href="{{ url_for('admin.medicine_detail', mid=m.id) }}">View</a></td></tr>
+          {% else %}<tr><td colspan="4" class="text-muted p-3">Empty.</td></tr>{% endfor %}
+        </tbody></table>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

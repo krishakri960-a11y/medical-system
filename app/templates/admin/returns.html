@@ -1,0 +1,16 @@
+{% extends "admin/layout.html" %}
+{% block page_title %}Returns{% endblock %}
+{% block content %}
+<form class="mb-3" method="get"><div class="input-group" style="max-width:320px"><input class="form-control" name="bill" value="{{ q_bill }}" placeholder="Bill #"><button class="btn btn-primary" type="submit">Search</button></div></form>
+<a href="{{ url_for('admin.returns_new') }}" class="btn btn-primary mb-3">New return</a>
+<div class="card card-soft table-responsive">
+  <table class="table mb-0">
+    <thead><tr><th>Date</th><th>Bill</th><th>Medicine</th><th>Qty</th><th class="text-end">Refund</th><th>Staff</th></tr></thead>
+    <tbody>
+      {% for r in returns %}
+      <tr><td>{{ r.return_date.strftime('%Y-%m-%d') }}</td><td>{{ r.bill.bill_number }}</td><td>{{ r.medicine.name }}</td><td>{{ r.quantity }}</td><td class="text-end">₹ {{ '%.2f'|format(r.refund_amount|float) }}</td><td>{{ r.staff.full_name }}</td></tr>
+      {% else %}<tr><td colspan="6" class="text-muted">No returns.</td></tr>{% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

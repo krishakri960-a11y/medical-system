@@ -1,0 +1,66 @@
+{# Staff desk — use `with context` on import for pagination & today in macros #}
+{% macro page_heading(title, subtitle=None) %}
+<div class="mb-4">
+  <h1 class="admin-page-title mb-1">{{ title }}</h1>
+  {% if subtitle %}<p class="text-muted small mb-0">{{ subtitle }}</p>{% endif %}
+</div>
+{% endmacro %}
+
+{% macro toolbar_search(action_url, placeholder='Search…', q='') %}
+<form class="row g-2 align-items-center flex-wrap mb-4" method="get" action="{{ action_url }}">
+  <div class="col-auto flex-grow-1" style="min-width:220px;max-width:360px">
+    <div class="input-group input-group-sm">
+      <span class="input-group-text bg-white border-end-0"><i class="bi bi-search text-muted"></i></span>
+      <input type="search" class="form-control border-start-0" name="q" value="{{ q }}" placeholder="{{ placeholder }}" autocomplete="off">
+    </div>
+  </div>
+  <div class="col-auto">
+    <button type="submit" class="btn btn-sm btn-outline-secondary">Search</button>
+    {% if q %}<a href="{{ action_url }}" class="btn btn-sm btn-link text-muted">Clear</a>{% endif %}
+  </div>
+</form>
+{% endmacro %}
+
+{% macro badge_stock(m) %}
+  {% if m.quantity == 0 %}
+    <span class="badge rounded-pill text-bg-secondary">Out</span>
+  {% elif m.expiry_date < today %}
+    <span class="badge rounded-pill text-bg-danger">Expired</span>
+  {% elif m.quantity <= m.min_stock_level %}
+    <span class="badge rounded-pill text-bg-warning text-dark">Low</span>
+  {% else %}
+    <span class="badge rounded-pill bg-success bg-opacity-10 text-success border">OK</span>
+  {% endif %}
+{% endmacro %}
+
+{% macro detail_row(label, value) %}
+<div class="row py-2 border-bottom border-light">
+  <div class="col-sm-4 text-muted small fw-semibold text-uppercase" style="letter-spacing:0.03em">{{ label }}</div>
+  <div class="col-sm-8">{{ value }}</div>
+</div>
+{% endmacro %}
+
+{% macro pagination_nav(pagination) %}
+{% if pagination and pagination.pages > 1 %}
+{% set start = (pagination.page - 1) * pagination.per_page + 1 if pagination.total else 0 %}
+{% set end = [pagination.page * pagination.per_page, pagination.total]|min %}
+<nav class="mt-4 d-flex justify-content-between align-items-center flex-wrap gap-2">
+  <div class="small text-muted">{% if pagination.total %}Showing {{ start }}–{{ end }} of {{ pagination.total }}{% endif %}</div>
+  <ul class="pagination pagination-sm mb-0">
+    <li class="page-item {% if not pagination.has_prev %}disabled{% endif %}">
+      <a class="page-link" href="{% if pagination.has_prev %}{{ paginate_url_global(pagination.prev_num) }}{% else %}#{% endif %}">Prev</a>
+    </li>
+    {% for p in pagination.iter_pages(left_edge=1, right_edge=1, left_current=2, right_current=2) %}
+      {% if p %}
+        <li class="page-item {% if p == pagination.page %}active{% endif %}"><a class="page-link" href="{{ paginate_url_global(p) }}">{{ p }}</a></li>
+      {% else %}
+        <li class="page-item disabled"><span class="page-link">…</span></li>
+      {% endif %}
+    {% endfor %}
+    <li class="page-item {% if not pagination.has_next %}disabled{% endif %}">
+      <a class="page-link" href="{% if pagination.has_next %}{{ paginate_url_global(pagination.next_num) }}{% else %}#{% endif %}">Next</a>
+    </li>
+  </ul>
+</nav>
+{% endif %}
+{% endmacro %}

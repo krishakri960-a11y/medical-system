@@ -1,0 +1,16 @@
+{% extends "admin/layout.html" %}
+{% block page_title %}Report · Stock{% endblock %}
+{% block content %}
+<div class="mb-3">
+  <a href="{{ url_for('admin.reports', name='low') }}" class="btn btn-sm btn-outline-secondary">Low</a>
+  <a href="{{ url_for('admin.reports', name='expired') }}" class="btn btn-sm btn-outline-secondary">Expired</a>
+  <a href="{{ url_for('admin.reports', name='purchase') }}" class="btn btn-sm btn-outline-secondary">Purchase</a>
+  <a href="{{ url_for('admin.reports', name='sales') }}" class="btn btn-sm btn-outline-secondary">Sales</a>
+  <a href="{{ url_for('admin.reports', name='profit') }}" class="btn btn-sm btn-outline-secondary">Profit</a>
+  <button class="btn btn-sm btn-primary float-end no-print" onclick="window.print()">Print</button>
+</div>
+<div class="card card-soft table-responsive"><table class="table table-sm mb-0"><thead><tr><th>Medicine</th><th>Batch</th><th>Brand</th><th>Qty</th><th>Min</th><th>Value</th></tr></thead><tbody>
+{% for m in rows %}<tr><td>{{ m.name }}</td><td>{{ m.batch_number }}</td><td>{{ m.brand.name }}</td><td>{{ m.quantity }}</td><td>{{ m.min_stock_level }}</td><td>₹ {{ '%.2f'|format((m.quantity * m.purchase_price)|float) }}</td></tr>
+{% else %}<tr><td colspan="6" class="text-muted">Empty.</td></tr>{% endfor %}
+</tbody></table></div>
+{% endblock %}

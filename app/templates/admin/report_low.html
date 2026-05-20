@@ -1,0 +1,5 @@
+{% extends "admin/layout.html" %}{% block page_title %}Report · Low stock{% endblock %}{% block content %}
+<button class="btn btn-sm btn-primary mb-3 no-print float-end" onclick="window.print()">Print</button>
+<div class="card card-soft table-responsive"><table class="table table-sm mb-0"><thead><tr><th>Medicine</th><th>Qty</th><th>Min</th></tr></thead><tbody>
+{% for m in rows %}<tr><td>{{ m.name }}</td><td>{{ m.quantity }}</td><td>{{ m.min_stock_level }}</td></tr>{% else %}<tr><td colspan="3" class="text-muted">None.</td></tr>{% endfor %}
+</tbody></table></div>{% endblock %}

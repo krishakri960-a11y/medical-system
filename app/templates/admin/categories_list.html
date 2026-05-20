@@ -1,0 +1,30 @@
+{% extends "admin/layout.html" %}
+{% from "admin/_macros.html" import page_heading, toolbar_search, action_group, pagination_nav with context %}
+{% block breadcrumb %}Master data · Categories{% endblock %}
+{% block page_title %}Categories{% endblock %}
+{% block content %}
+{{ page_heading("Therapeutic categories", "Segment medicines for reporting and shelf logic.") }}
+<div class="page-action-bar">
+  <div class="flex-grow-1">{{ toolbar_search(url_for('admin.categories'), 'Search categories…', q) }}</div>
+  <a href="{{ url_for('admin.category_new') }}" class="btn btn-brand"><i class="bi bi-plus-lg me-1"></i> New category</a>
+</div>
+<div class="card card-soft table-responsive">
+  <table class="table table-hover align-middle mb-0">
+    <thead><tr><th>ID</th><th>Name</th><th>Summary</th><th class="text-end">SKUs</th><th class="text-end">Actions</th></tr></thead>
+    <tbody>
+      {% for c in categories %}
+      <tr>
+        <td class="text-muted small">#{{ c.id }}</td>
+        <td class="fw-semibold">{{ c.name }}</td>
+        <td class="text-muted small">{% if c.description %}{{ c.description[:70] }}{% if c.description|length > 70 %}…{% endif %}{% else %}—{% endif %}</td>
+        <td class="text-end"><span class="badge bg-light text-dark border">{{ c.medicines.count() }}</span></td>
+        <td class="text-end">{{ action_group(url_for('admin.category_detail', cid=c.id), url_for('admin.category_edit', cid=c.id), url_for('admin.category_delete', cid=c.id) if c.medicines.count() == 0 else None) }}</td>
+      </tr>
+      {% else %}
+      <tr><td colspan="5"><div class="empty-state">No categories. <a href="{{ url_for('admin.category_new') }}">Add one</a>.</div></td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {{ pagination_nav(pagination) }}
+</div>
+{% endblock %}

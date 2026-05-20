@@ -1,0 +1,5 @@
+{% extends "admin/layout.html" %}{% block page_title %}Report · Sales{% endblock %}{% block content %}
+<button class="btn btn-sm btn-primary mb-3 no-print float-end" onclick="window.print()">Print</button>
+<div class="card card-soft table-responsive"><table class="table table-sm mb-0"><thead><tr><th>Bill</th><th>Date</th><th>Customer</th><th>Total</th></tr></thead><tbody>
+{% for b in rows %}<tr><td>{{ b.bill_number }}</td><td>{{ b.created_at }}</td><td>{{ b.customer.name }}</td><td>₹ {{ '%.2f'|format(b.grand_total|float) }}</td></tr>{% else %}<tr><td colspan="4">None.</td></tr>{% endfor %}
+</tbody></table></div>{% endblock %}

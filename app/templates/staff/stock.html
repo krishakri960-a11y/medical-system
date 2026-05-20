@@ -1,0 +1,43 @@
+{% extends "staff/layout.html" %}
+{% from "staff/_macros.html" import badge_stock with context %}
+{% block breadcrumb %}Inventory · Stock{% endblock %}
+{% block page_title %}Stock levels{% endblock %}
+{% block content %}
+<div class="btn-group flex-wrap mb-3" role="group">
+  <a class="btn btn-outline-secondary {% if view == 'all' %}active{% endif %}" href="{{ url_for('staff.stock') }}">All</a>
+  <a class="btn btn-outline-warning {% if view == 'low' %}active{% endif %}" href="{{ url_for('staff.stock', view='low') }}">Low</a>
+  <a class="btn btn-outline-danger {% if view == 'expired' %}active{% endif %}" href="{{ url_for('staff.stock', view='expired') }}">Expired</a>
+  <a class="btn btn-outline-info {% if view == 'soon' %}active{% endif %}" href="{{ url_for('staff.stock', view='soon') }}">Expiring (60d)</a>
+</div>
+
+{% if view == 'all' %}
+<form class="row g-2 mb-4 align-items-end flex-wrap" method="get" action="{{ url_for('staff.stock') }}">
+  <div class="col-auto flex-grow-1" style="min-width:220px;max-width:360px">
+    <label class="form-label small text-muted mb-1">Search catalogue</label>
+    <input class="form-control form-control-sm" name="q" value="{{ q }}" placeholder="Medicine or batch">
+  </div>
+  <div class="col-auto"><button type="submit" class="btn btn-sm btn-staff-brand">Search</button></div>
+  {% if q %}<div class="col-auto"><a href="{{ url_for('staff.stock') }}" class="btn btn-sm btn-outline-secondary">Clear</a></div>{% endif %}
+</form>
+{% endif %}
+
+<div class="card card-soft table-responsive">
+  <table class="table table-hover mb-0 align-middle">
+    <thead class="table-light"><tr><th>Medicine</th><th>Batch</th><th>Status</th><th class="text-end">Qty</th><th>Expiry</th><th></th></tr></thead>
+    <tbody>
+      {% for m in medicines %}
+      <tr>
+        <td class="fw-semibold">{{ m.name }}</td>
+        <td class="small font-monospace">{{ m.batch_number }}</td>
+        <td>{{ badge_stock(m) }}</td>
+        <td class="text-end">{{ m.quantity }}</td>
+        <td class="small {% if m.expiry_date < today %}text-danger{% endif %}">{{ m.expiry_date }}</td>
+        <td class="text-end"><a class="btn btn-sm btn-outline-secondary" href="{{ url_for('staff.medicine_detail', mid=m.id) }}">Details</a></td>
+      </tr>
+      {% else %}
+      <tr><td colspan="6" class="empty-state">Nothing to show for this view.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

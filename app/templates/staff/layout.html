@@ -1,0 +1,87 @@
+{% extends "base.html" %}
+{% set staff_sales_ep = ['staff.sales', 'staff.bill_detail', 'staff.bill_print'] %}
+{% set staff_cust_ep = ['staff.customers', 'staff.customer_new', 'staff.customer_detail', 'staff.customer_edit'] %}
+{% set staff_ret_ep = ['staff.returns_list', 'staff.returns_new'] %}
+{% set staff_med_ep = ['staff.medicines', 'staff.medicine_detail'] %}
+{% block body %}
+<div class="staff-shell d-flex">
+  <aside class="sidebar-staff no-print d-none d-lg-block">
+    <div class="brand-block">
+      <div class="d-flex align-items-center gap-2 text-white">
+        <span class="rounded-2 d-flex p-2" style="background:rgba(16,185,129,0.2);"><i class="bi bi-heart-pulse text-success"></i></span>
+        <div>
+          <div class="product-name fw-bold">MedInventory</div>
+          <div class="small text-secondary" style="font-size:0.7rem;">Staff desk</div>
+        </div>
+      </div>
+    </div>
+    <nav class="nav flex-column pb-4">
+      <div class="nav-section-label">Desk</div>
+      <a class="nav-link {% if request.endpoint == 'staff.dashboard' %}active{% endif %}" href="{{ url_for('staff.dashboard') }}"><i class="bi bi-speedometer2"></i> Dashboard</a>
+
+      <div class="nav-section-label">Sales &amp; customers</div>
+      <a class="nav-link {% if request.endpoint == 'staff.billing' %}active{% endif %}" href="{{ url_for('staff.billing') }}"><i class="bi bi-receipt"></i> New bill</a>
+      <a class="nav-link {% if request.endpoint in staff_sales_ep %}active{% endif %}" href="{{ url_for('staff.sales') }}"><i class="bi bi-graph-up"></i> My sales</a>
+      <a class="nav-link {% if request.endpoint in staff_cust_ep %}active{% endif %}" href="{{ url_for('staff.customers') }}"><i class="bi bi-people"></i> Customers</a>
+      <a class="nav-link {% if request.endpoint in staff_ret_ep %}active{% endif %}" href="{{ url_for('staff.returns_list') }}"><i class="bi bi-arrow-return-left"></i> Returns</a>
+
+      <div class="nav-section-label">Inventory</div>
+      <a class="nav-link {% if request.endpoint in staff_med_ep %}active{% endif %}" href="{{ url_for('staff.medicines') }}"><i class="bi bi-capsule"></i> Medicines</a>
+      <a class="nav-link {% if request.endpoint == 'staff.stock' %}active{% endif %}" href="{{ url_for('staff.stock') }}"><i class="bi bi-boxes"></i> Stock</a>
+
+      <div class="nav-section-label">Account</div>
+      <a class="nav-link {% if request.endpoint == 'staff.profile' %}active{% endif %}" href="{{ url_for('staff.profile') }}"><i class="bi bi-person"></i> Profile</a>
+      <a class="nav-link {% if request.endpoint == 'staff.change_password' %}active{% endif %}" href="{{ url_for('staff.change_password') }}"><i class="bi bi-key"></i> Password</a>
+      <a class="nav-link text-danger mt-2" href="{{ url_for('main.logout') }}"><i class="bi bi-box-arrow-right"></i> Logout</a>
+    </nav>
+  </aside>
+  <div class="staff-main-with-sidebar flex-grow-1">
+    <header class="topbar d-flex flex-wrap justify-content-between align-items-center gap-2 no-print">
+      <div class="d-flex align-items-center gap-2">
+        <button class="btn btn-outline-secondary btn-sm d-lg-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#staffMenu" aria-label="Menu"><i class="bi bi-list"></i></button>
+        <div>
+          <div class="admin-breadcrumb">{% block breadcrumb %}Desk{% endblock %}</div>
+          <h1 class="admin-page-title mb-0">{% block page_title %}Console{% endblock %}</h1>
+        </div>
+      </div>
+      <div class="d-flex align-items-center gap-3 text-end">
+        <div class="d-none d-md-block small text-muted">{{ moment or '' }}</div>
+        <div>
+          <div class="fw-semibold small">{{ current_user.full_name }}</div>
+          <span class="badge rounded-pill text-bg-success bg-opacity-75">Staff</span>
+        </div>
+      </div>
+    </header>
+    <main class="p-4 pt-3">
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% for cat, msg in messages %}
+          <div class="alert alert-{{ cat }} alert-dismissible fade show" role="alert">
+            {{ msg }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+          </div>
+        {% endfor %}
+      {% endwith %}
+      {% block content %}{% endblock %}
+    </main>
+  </div>
+</div>
+
+<div class="offcanvas offcanvas-start text-bg-dark d-lg-none" tabindex="-1" id="staffMenu">
+  <div class="offcanvas-header border-bottom border-secondary">
+    <span class="offcanvas-title fw-bold"><i class="bi bi-grid-3x3-gap me-2"></i>Staff menu</span>
+    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas"></button>
+  </div>
+  <div class="offcanvas-body p-0 small">
+    <a class="d-block px-3 py-2 text-white-50 text-decoration-none border-bottom border-secondary border-opacity-25" href="{{ url_for('staff.dashboard') }}">Dashboard</a>
+    <a class="d-block px-3 py-2 text-white-50 text-decoration-none border-bottom border-secondary border-opacity-25" href="{{ url_for('staff.billing') }}">New bill</a>
+    <a class="d-block px-3 py-2 text-white-50 text-decoration-none border-bottom border-secondary border-opacity-25" href="{{ url_for('staff.sales') }}">My sales</a>
+    <a class="d-block px-3 py-2 text-white-50 text-decoration-none border-bottom border-secondary border-opacity-25" href="{{ url_for('staff.customers') }}">Customers</a>
+    <a class="d-block px-3 py-2 text-white-50 text-decoration-none border-bottom border-secondary border-opacity-25" href="{{ url_for('staff.medicines') }}">Medicines</a>
+    <a class="d-block px-3 py-2 text-white-50 text-decoration-none border-bottom border-secondary border-opacity-25" href="{{ url_for('staff.stock') }}">Stock</a>
+    <a class="d-block px-3 py-2 text-white-50 text-decoration-none border-bottom border-secondary border-opacity-25" href="{{ url_for('staff.returns_list') }}">Returns</a>
+    <a class="d-block px-3 py-2 text-white-50 text-decoration-none border-bottom border-secondary border-opacity-25" href="{{ url_for('staff.profile') }}">Profile</a>
+    <a class="d-block px-3 py-2 text-danger text-decoration-none" href="{{ url_for('main.logout') }}">Logout</a>
+  </div>
+</div>
+{% block scripts %}{% endblock %}
+{% endblock %}

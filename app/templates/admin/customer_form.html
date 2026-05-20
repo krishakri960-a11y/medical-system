@@ -1,0 +1,18 @@
+{% extends "admin/layout.html" %}
+{% from "admin/_macros.html" import page_heading %}
+{% block breadcrumb %}<a href="{{ url_for('admin.customers') }}" class="text-muted text-decoration-none">Customers</a> · {% if customer %}Edit{% else %}New{% endif %}{% endblock %}
+{% block page_title %}{% if customer %}Edit customer{% else %}New customer{% endif %}{% endblock %}
+{% block content %}
+{{ page_heading("Customer record", "Information printed on invoices and used for follow-up.") }}
+<div class="row justify-content-center"><div class="col-lg-7">
+<div class="card card-soft"><div class="card-body p-4">
+<form method="post" action="{% if customer %}{{ url_for('admin.customer_edit', cid=customer.id) }}{% else %}{{ url_for('admin.customer_new') }}{% endif %}">
+  <div class="mb-3"><label class="form-label fw-semibold">Full name <span class="text-danger">*</span></label><input class="form-control" name="name" required value="{{ customer.name if customer else '' }}"></div>
+  <div class="mb-3"><label class="form-label fw-semibold">Contact number</label><input class="form-control" name="contact_number" value="{{ customer.contact_number if customer else '' }}"></div>
+  <div class="mb-3"><label class="form-label fw-semibold">Email</label><input type="email" class="form-control" name="email" value="{{ customer.email if customer else '' }}"></div>
+  <div class="mb-4"><label class="form-label fw-semibold">Address</label><textarea class="form-control" name="address" rows="2">{{ customer.address if customer else '' }}</textarea></div>
+  <button type="submit" class="btn btn-primary px-4">{% if customer %}Update{% else %}Create{% endif %}</button>
+  <a href="{% if customer %}{{ url_for('admin.customer_detail', cid=customer.id) }}{% else %}{{ url_for('admin.customers') }}{% endif %}" class="btn btn-outline-secondary">Cancel</a>
+</form>
+</div></div></div></div>
+{% endblock %}

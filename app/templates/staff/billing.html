@@ -1,0 +1,78 @@
+{% extends "staff/layout.html" %}
+{% block breadcrumb %}Sales · Point of sale{% endblock %}
+{% block page_title %}New bill{% endblock %}
+{% block content %}
+<p class="text-muted small mb-4">Add line items, apply discount and tax, then save. You will land on the bill summary with a print option.</p>
+<form method="post" id="billForm">
+  <div class="row g-3">
+    <div class="col-md-4">
+      <label class="form-label">Customer</label>
+      <select class="form-select" name="customer_id" required>{% for c in customers %}<option value="{{ c.id }}">{{ c.name }}{% if c.contact_number %} — {{ c.contact_number }}{% endif %}</option>{% endfor %}</select>
+    </div>
+    <div class="col-md-2"><label class="form-label">Discount %</label><input class="form-control" type="number" step="0.01" name="discount_percent" value="0" id="disc"></div>
+    <div class="col-md-2"><label class="form-label">Tax %</label><input class="form-control" type="number" step="0.01" name="tax_percent" value="0" id="tax"></div>
+    <div class="col-md-4"><label class="form-label">Notes</label><input class="form-control" name="notes" placeholder="Prescription / internal note"></div>
+  </div>
+  <hr class="my-4">
+  <div class="table-responsive">
+    <table class="table align-middle" id="linesTable">
+      <thead class="table-light"><tr><th>Medicine</th><th style="width:100px">Qty</th><th class="text-end">Price</th><th class="text-end">Line</th></tr></thead>
+      <tbody>
+        {% for i in range(12) %}
+        <tr class="line-row">
+          <td><select class="form-select form-select-sm med-select" name="medicine_id"><option value="">— Select —</option>{% for m in medicines %}<option value="{{ m.id }}" data-price="{{ m.selling_price }}">{{ m.name }} ({{ m.batch_number }}) · {{ m.quantity }} in stock</option>{% endfor %}</select></td>
+          <td><input type="number" class="form-control form-control-sm qty-inp" name="qty" min="0" value="0"></td>
+          <td class="price-cell small text-muted text-end">—</td>
+          <td class="line-cell small text-end">—</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  <div class="row mb-4">
+    <div class="col-md-6 ms-md-auto">
+      <div class="card card-soft p-3">
+        <div class="d-flex justify-content-between"><span class="text-muted">Subtotal</span><span id="subDisplay">₹ 0.00</span></div>
+        <div class="d-flex justify-content-between"><span class="text-muted">Discount</span><span id="discDisplay">₹ 0.00</span></div>
+        <div class="d-flex justify-content-between"><span class="text-muted">Tax</span><span id="taxDisplay">₹ 0.00</span></div>
+        <hr class="my-2">
+        <div class="d-flex justify-content-between fw-bold fs-5"><span>Grand</span><span id="grandDisplay" class="text-success">₹ 0.00</span></div>
+      </div>
+    </div>
+  </div>
+  <button type="submit" class="btn btn-staff-brand btn-lg"><i class="bi bi-check2-circle me-2"></i>Save bill</button>
+  <a href="{{ url_for('staff.sales') }}" class="btn btn-outline-secondary btn-lg ms-2">Cancel</a>
+</form>
+{% endblock %}
+{% block scripts %}
+<script>
+(function(){
+  function num(el){ return parseFloat(el.value) || 0; }
+  function recalc(){
+    let sub = 0;
+    document.querySelectorAll('.line-row').forEach(function(row){
+      const sel = row.querySelector('.med-select');
+      const q = num(row.querySelector('.qty-inp'));
+      const opt = sel.options[sel.selectedIndex];
+      const price = opt && opt.dataset.price ? parseFloat(opt.dataset.price) : 0;
+      sub += price * q;
+      row.querySelector('.price-cell').textContent = price ? '₹ ' + price.toFixed(2) : '—';
+      row.querySelector('.line-cell').textContent = (price*q) ? '₹ ' + (price*q).toFixed(2) : '—';
+    });
+    const d = num(document.getElementById('disc'));
+    const t = num(document.getElementById('tax'));
+    const discAmt = sub * d / 100;
+    const after = sub - discAmt;
+    const taxAmt = after * t / 100;
+    document.getElementById('subDisplay').textContent = '₹ ' + sub.toFixed(2);
+    document.getElementById('discDisplay').textContent = '₹ ' + discAmt.toFixed(2);
+    document.getElementById('taxDisplay').textContent = '₹ ' + taxAmt.toFixed(2);
+    document.getElementById('grandDisplay').textContent = '₹ ' + (after + taxAmt).toFixed(2);
+  }
+  document.getElementById('linesTable').addEventListener('change', recalc);
+  document.getElementById('disc').addEventListener('input', recalc);
+  document.getElementById('tax').addEventListener('input', recalc);
+  recalc();
+})();
+</script>
+{% endblock %}

@@ -1,0 +1,48 @@
+{% extends "admin/layout.html" %}
+{% block page_title %}Expiry center{% endblock %}
+{% block content %}
+<form class="row g-2 mb-4" method="get">
+  <div class="col-auto"><label class="small">Expiring within (days)</label><input class="form-control" type="number" name="soon" value="{{ soon_days }}" min="1" max="730"></div>
+  <div class="col-auto"><label class="small">Search by expiry date</label><input class="form-control" type="date" name="on" value="{{ search_date or '' }}"></div>
+  <div class="col-auto align-self-end"><button class="btn btn-primary" type="submit">Apply</button></div>
+</form>
+
+<h5 class="text-danger">Expired on hand</h5>
+<div class="card card-soft mb-4">
+  <form method="post" action="{{ url_for('admin.stock_remove_expired') }}">
+    <div class="table-responsive">
+      <table class="table mb-0"><thead><tr><th><input type="checkbox" onclick="document.querySelectorAll('.exchk').forEach(c=>c.checked=this.checked)"></th><th>Medicine</th><th>Batch</th><th>Qty</th><th>Expiry</th><th>Loss @ cost</th></tr></thead>
+      <tbody>
+        {% for m in expired %}
+        <tr>
+          <td><input type="checkbox" class="exchk" name="medicine_ids" value="{{ m.id }}" checked></td>
+          <td>{{ m.name }}</td><td>{{ m.batch_number }}</td><td>{{ m.quantity }}</td><td>{{ m.expiry_date }}</td>
+          <td>₹ {{ '%.2f'|format((m.quantity * m.purchase_price)|float) }}</td>
+        </tr>
+        {% else %}<tr><td colspan="6" class="text-muted">No expired stock.</td></tr>{% endfor %}
+      </tbody></table>
+    </div>
+    {% if expired %}<div class="p-3"><button type="submit" class="btn btn-danger" onclick="return confirm('Remove selected expired lines?');">Remove selected</button></div>{% endif %}
+  </form>
+</div>
+
+<h5 class="text-warning">Expiring soon ({{ soon_days }} days)</h5>
+<div class="card card-soft mb-4 table-responsive">
+  <table class="table mb-0"><thead><tr><th>Medicine</th><th>Batch</th><th>Qty</th><th>Expiry</th></tr></thead>
+  <tbody>
+    {% for m in soon %}<tr><td>{{ m.name }}</td><td>{{ m.batch_number }}</td><td>{{ m.quantity }}</td><td>{{ m.expiry_date }}</td></tr>
+    {% else %}<tr><td colspan="4" class="text-muted">None.</td></tr>{% endfor %}
+  </tbody></table>
+</div>
+
+{% if search_date %}
+<h5>On {{ search_date }}</h5>
+<div class="card card-soft table-responsive">
+  <table class="table mb-0"><thead><tr><th>Medicine</th><th>Batch</th><th>Qty</th></tr></thead>
+  <tbody>
+    {% for m in searched %}<tr><td>{{ m.name }}</td><td>{{ m.batch_number }}</td><td>{{ m.quantity }}</td></tr>
+    {% else %}<tr><td colspan="3" class="text-muted">No batches.</td></tr>{% endfor %}
+  </tbody></table>
+</div>
+{% endif %}
+{% endblock %}

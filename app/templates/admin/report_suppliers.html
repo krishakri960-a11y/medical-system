@@ -1,0 +1,5 @@
+{% extends "admin/layout.html" %}{% block page_title %}Report · Suppliers{% endblock %}{% block content %}
+<button class="btn btn-sm btn-primary mb-3 no-print float-end" onclick="window.print()">Print</button>
+<div class="card card-soft table-responsive"><table class="table table-sm mb-0"><thead><tr><th>Name</th><th>Company</th><th>Contact</th></tr></thead><tbody>
+{% for s in rows %}<tr><td>{{ s.name }}</td><td>{{ s.company_name }}</td><td>{{ s.contact_number }}</td></tr>{% else %}<tr><td colspan="3">None.</td></tr>{% endfor %}
+</tbody></table></div>{% endblock %}

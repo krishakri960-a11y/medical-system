@@ -1,0 +1,16 @@
+{% extends "admin/layout.html" %}
+{% from "admin/_macros.html" import page_heading %}
+{% block breadcrumb %}<a href="{{ url_for('admin.categories') }}" class="text-muted text-decoration-none">Categories</a> · {% if category %}Edit{% else %}New{% endif %}{% endblock %}
+{% block page_title %}{% if category %}Edit category{% else %}New category{% endif %}{% endblock %}
+{% block content %}
+{{ page_heading("Category record", "Used for analytics and medicine grouping.") }}
+<div class="row justify-content-center"><div class="col-lg-7">
+<div class="card card-soft"><div class="card-body p-4">
+<form method="post" action="{% if category %}{{ url_for('admin.category_edit', cid=category.id) }}{% else %}{{ url_for('admin.category_new') }}{% endif %}">
+  <div class="mb-3"><label class="form-label fw-semibold">Name <span class="text-danger">*</span></label><input class="form-control" name="name" required maxlength="120" value="{{ category.name if category else '' }}"></div>
+  <div class="mb-4"><label class="form-label fw-semibold">Description</label><textarea class="form-control" name="description" rows="3">{{ category.description if category else '' }}</textarea></div>
+  <button type="submit" class="btn btn-primary px-4">{% if category %}Save{% else %}Create{% endif %}</button>
+  <a href="{% if category %}{{ url_for('admin.category_detail', cid=category.id) }}{% else %}{{ url_for('admin.categories') }}{% endif %}" class="btn btn-outline-secondary">Cancel</a>
+</form>
+</div></div></div></div>
+{% endblock %}

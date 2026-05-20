@@ -1,0 +1,32 @@
+{% extends "admin/layout.html" %}
+{% block page_title %}Analytics{% endblock %}
+{% block content %}
+<div class="row g-3 mb-4">
+  <div class="col-md-4"><div class="card card-soft p-3"><div class="text-muted small">Total revenue</div><div class="fs-3 fw-bold text-primary">₹ {{ '%.2f'|format(revenue|float) }}</div></div></div>
+  <div class="col-md-4"><div class="card card-soft p-3"><div class="text-muted small">Total profit (est.)</div><div class="fs-3 fw-bold text-success">₹ {{ '%.2f'|format(profit|float) }}</div></div></div>
+  <div class="col-md-4"><div class="card card-soft p-3"><div class="text-muted small">Stock value / Expiry loss</div><div class="fs-5 fw-bold">₹ {{ '%.2f'|format(stock_value|float) }} <span class="text-danger small">/ −{{ '%.2f'|format(expiry_loss|float) }}</span></div></div></div>
+</div>
+<div class="row g-3 mb-4">
+  <div class="col-lg-6"><div class="card card-soft p-3"><h6 class="text-muted small text-uppercase">Daily revenue (14 days)</h6><canvas id="cDaily" height="180"></canvas></div></div>
+  <div class="col-lg-6"><div class="card card-soft p-3"><h6 class="text-muted small text-uppercase">Monthly revenue trend</h6><canvas id="cMonthly" height="180"></canvas></div></div>
+</div>
+<div class="row g-3 mb-4">
+  <div class="col-lg-6"><div class="card card-soft p-3"><h6 class="text-muted small text-uppercase">Category sales</h6><canvas id="cCat" height="200"></canvas></div></div>
+  <div class="col-lg-6"><div class="card card-soft p-3"><h6 class="text-muted small text-uppercase">Brand sales</h6><canvas id="cBrand" height="200"></canvas></div></div>
+</div>
+<div class="row g-3">
+  <div class="col-md-6"><div class="card card-soft p-3"><h6>Best sellers</h6><ul class="list-group list-group-flush">{% for r in best %}<li class="list-group-item d-flex justify-content-between"><span>{{ r.name }}</span><span class="badge bg-primary">{{ r.qty }}</span></li>{% else %}<li class="list-group-item text-muted">No data</li>{% endfor %}</ul></div></div>
+  <div class="col-md-6"><div class="card card-soft p-3"><h6>Low rotation</h6><ul class="list-group list-group-flush">{% for r in low_sell %}<li class="list-group-item d-flex justify-content-between"><span>{{ r.name }}</span><span class="badge bg-secondary">{{ r.qty }}</span></li>{% else %}<li class="list-group-item text-muted">No data</li>{% endfor %}</ul></div></div>
+</div>
+{% endblock %}
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
+<script>
+const chart = {{ chart | tojson }};
+Chart.defaults.font.family = "'Segoe UI',system-ui,sans-serif";
+new Chart(document.getElementById('cDaily'), { type: 'line', data: { labels: chart.daily_labels, datasets: [{ label: 'Revenue', data: chart.daily_data, borderColor: '#0d6efd', tension: 0.25, fill: true, backgroundColor: 'rgba(13,110,253,0.1)' }] }, options: { plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true } } } });
+new Chart(document.getElementById('cMonthly'), { type: 'bar', data: { labels: chart.monthly_labels, datasets: [{ label: 'Revenue', data: chart.monthly_data, backgroundColor: '#0891b2' }] }, options: { plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true } } } });
+new Chart(document.getElementById('cCat'), { type: 'doughnut', data: { labels: chart.cat_labels, datasets: [{ data: chart.cat_data, backgroundColor: ['#0d6efd','#6f42c1','#d63384','#fd7e14','#198754','#20c997','#0dcaf0'] }] }, options: { plugins: { legend: { position: 'bottom' } } } });
+new Chart(document.getElementById('cBrand'), { type: 'polarArea', data: { labels: chart.brand_labels, datasets: [{ data: chart.brand_data, backgroundColor: ['rgba(13,110,253,0.7)','rgba(8,145,178,0.7)','rgba(99,102,241,0.7)','rgba(14,165,233,0.7)','rgba(16,185,129,0.7)'] }] }, options: { scales: { r: { beginAtZero: true } } } });
+</script>
+{% endblock %}

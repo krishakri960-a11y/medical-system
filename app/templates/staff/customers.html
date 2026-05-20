@@ -1,0 +1,44 @@
+{% extends "staff/layout.html" %}
+{% from "staff/_macros.html" import toolbar_search, pagination_nav with context %}
+{% block breadcrumb %}Sales · Customers{% endblock %}
+{% block page_title %}Customers{% endblock %}
+{% block content %}
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+  <p class="text-muted small mb-0">Manage walk-in and registered customers you serve at the desk.</p>
+  <a href="{{ url_for('staff.customer_new') }}" class="btn btn-sm btn-staff-brand"><i class="bi bi-person-plus me-1"></i>Add customer</a>
+</div>
+{{ toolbar_search(url_for('staff.customers'), 'Name, phone, or email…', q) }}
+
+<div class="card card-soft table-responsive">
+  <table class="table table-hover mb-0 align-middle">
+    <thead class="table-light">
+      <tr>
+        <th>Customer</th>
+        <th>Contact</th>
+        <th>Since</th>
+        <th class="text-end">Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for c in customers %}
+      <tr>
+        <td class="fw-semibold">{{ c.name }}</td>
+        <td class="small">
+          {% if c.contact_number %}<span class="d-block text-muted"><i class="bi bi-telephone me-1"></i>{{ c.contact_number }}</span>{% endif %}
+          {% if c.email %}<span class="d-block text-muted"><i class="bi bi-envelope me-1"></i>{{ c.email }}</span>{% endif %}
+          {% if not c.contact_number and not c.email %}<span class="text-muted">—</span>{% endif %}
+        </td>
+        <td class="small text-muted">{{ c.created_at.strftime('%Y-%m-%d') if c.created_at else '—' }}</td>
+        <td class="text-end">
+          <a class="btn btn-sm btn-outline-secondary" href="{{ url_for('staff.customer_detail', cid=c.id) }}">View</a>
+          <a class="btn btn-sm btn-outline-primary" href="{{ url_for('staff.customer_edit', cid=c.id) }}">Edit</a>
+        </td>
+      </tr>
+      {% else %}
+      <tr><td colspan="4" class="empty-state">No customers yet. <a href="{{ url_for('staff.customer_new') }}">Create one</a>.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{{ pagination_nav(pagination) }}
+{% endblock %}

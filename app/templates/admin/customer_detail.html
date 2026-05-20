@@ -1,0 +1,47 @@
+{% extends "admin/layout.html" %}
+{% from "admin/_macros.html" import detail_row %}
+{% block breadcrumb %}<a href="{{ url_for('admin.customers') }}" class="text-muted text-decoration-none">Customers</a> · Profile{% endblock %}
+{% block page_title %}{{ customer.name }}{% endblock %}
+{% block content %}
+<div class="d-flex flex-wrap gap-2 mb-3">
+  <a href="{{ url_for('admin.customers') }}" class="btn btn-outline-secondary btn-sm"><i class="bi bi-arrow-left"></i> All</a>
+  <a href="{{ url_for('admin.customer_edit', cid=customer.id) }}" class="btn btn-primary btn-sm">Edit</a>
+  <a href="{{ url_for('admin.billing_new') }}" class="btn btn-outline-primary btn-sm">New bill</a>
+  {% if bill_count == 0 %}
+  <form method="post" action="{{ url_for('admin.customer_delete', cid=customer.id) }}" class="d-inline" onsubmit="return confirm('Delete customer?');"><button type="submit" class="btn btn-outline-danger btn-sm">Delete</button></form>
+  {% endif %}
+</div>
+<div class="row g-3">
+  <div class="col-lg-4">
+    <div class="card card-soft detail-card">
+      <div class="card-header">Demographics</div>
+      <div class="card-body p-0">
+        {{ detail_row("Customer ID", "#" ~ customer.id) }}
+        {{ detail_row("Full name", customer.name) }}
+        {{ detail_row("Phone", customer.contact_number or "—") }}
+        {{ detail_row("Email", customer.email or "—") }}
+        {{ detail_row("Address", customer.address or "—") }}
+        {{ detail_row("Registered", customer.created_at.strftime('%Y-%m-%d %H:%M') if customer.created_at else "—") }}
+      </div>
+    </div>
+    <div class="card card-soft mt-3 p-3">
+      <div class="small text-muted">Lifetime billed</div>
+      <div class="fs-4 fw-bold text-success">₹ {{ '%.2f'|format(total_spend|float) }}</div>
+      <div class="small text-muted">{{ bill_count }} invoice(s)</div>
+    </div>
+  </div>
+  <div class="col-lg-8">
+    <div class="card card-soft detail-card">
+      <div class="card-header">Billing history</div>
+      <div class="table-responsive">
+        <table class="table table-sm mb-0"><thead><tr><th>Date</th><th>Bill</th><th>Staff</th><th class="text-end">Total</th><th></th></tr></thead>
+        <tbody>
+          {% for b in bills %}
+          <tr><td class="small">{{ b.created_at.strftime('%Y-%m-%d') }}</td><td class="fw-semibold">{{ b.bill_number }}</td><td>{{ b.staff.full_name }}</td><td class="text-end">₹ {{ '%.2f'|format(b.grand_total|float) }}</td><td><a href="{{ url_for('admin.bill_detail', bid=b.id) }}">View</a></td></tr>
+          {% else %}<tr><td colspan="5" class="text-muted p-3">No bills.</td></tr>{% endfor %}
+        </tbody></table>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

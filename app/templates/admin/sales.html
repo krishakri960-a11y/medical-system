@@ -1,0 +1,36 @@
+{% extends "admin/layout.html" %}
+{% block page_title %}Sales{% endblock %}
+{% block content %}
+<div class="btn-group mb-3 flex-wrap">
+  <a class="btn btn-outline-primary active" href="{{ url_for('admin.sales') }}">All sales</a>
+  <a class="btn btn-outline-primary" href="{{ url_for('admin.sales_medicine_wise') }}">Medicine-wise</a>
+  <a class="btn btn-outline-primary" href="{{ url_for('admin.sales_daily') }}">Daily</a>
+  <a class="btn btn-outline-primary" href="{{ url_for('admin.sales_monthly') }}">Monthly</a>
+</div>
+<form class="row g-2 mb-3" method="get">
+  <div class="col-auto"><input class="form-control" name="bill" value="{{ bill_q }}" placeholder="Bill #"></div>
+  <div class="col-auto"><input class="form-control" name="customer" value="{{ cust_q }}" placeholder="Customer"></div>
+  <div class="col-auto"><input type="date" class="form-control" name="date_from" value="{{ date_from or '' }}"></div>
+  <div class="col-auto"><input type="date" class="form-control" name="date_to" value="{{ date_to or '' }}"></div>
+  <div class="col-auto"><button class="btn btn-primary" type="submit">Search</button></div>
+</form>
+<div class="card card-soft table-responsive">
+  <table class="table table-hover mb-0">
+    <thead><tr><th>Bill</th><th>When</th><th>Customer</th><th>Staff</th><th class="text-end">Total</th><th></th></tr></thead>
+    <tbody>
+      {% for b in bills %}
+      <tr>
+        <td>{{ b.bill_number }}</td>
+        <td>{{ b.created_at.strftime('%Y-%m-%d') }}</td>
+        <td>{{ b.customer.name }}</td>
+        <td>{{ b.staff.full_name }}</td>
+        <td class="text-end">₹ {{ '%.2f'|format(b.grand_total|float) }}</td>
+        <td><a class="btn btn-sm btn-outline-secondary" href="{{ url_for('admin.bill_print', bid=b.id) }}">Print</a></td>
+      </tr>
+      {% else %}
+      <tr><td colspan="6" class="text-muted">No sales match.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

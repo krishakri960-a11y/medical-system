@@ -1,0 +1,31 @@
+{% extends "admin/layout.html" %}
+{% from "admin/_macros.html" import page_heading, toolbar_search, action_group, pagination_nav with context %}
+{% block breadcrumb %}Relationships · Customers{% endblock %}
+{% block page_title %}Customers{% endblock %}
+{% block content %}
+{{ page_heading("Customer master", "Billing profiles and walk-in records.") }}
+<div class="page-action-bar">
+  <div class="flex-grow-1">{{ toolbar_search(url_for('admin.customers'), 'Name, phone, email…', q) }}</div>
+  <a href="{{ url_for('admin.customer_new') }}" class="btn btn-brand"><i class="bi bi-plus-lg me-1"></i> New customer</a>
+</div>
+<div class="card card-soft table-responsive">
+  <table class="table table-hover align-middle mb-0">
+    <thead><tr><th>ID</th><th>Name</th><th>Phone</th><th>Email</th><th class="text-end">Bills</th><th class="text-end">Actions</th></tr></thead>
+    <tbody>
+      {% for c in customers %}
+      <tr>
+        <td class="small text-muted">#{{ c.id }}</td>
+        <td class="fw-semibold">{{ c.name }}</td>
+        <td class="small">{{ c.contact_number or "—" }}</td>
+        <td class="small text-muted">{{ c.email or "—" }}</td>
+        <td class="text-end"><span class="badge bg-light text-dark border">{{ c.bills.count() }}</span></td>
+        <td class="text-end">{{ action_group(url_for('admin.customer_detail', cid=c.id), url_for('admin.customer_edit', cid=c.id), url_for('admin.customer_delete', cid=c.id) if c.bills.count() == 0 else None) }}</td>
+      </tr>
+      {% else %}
+      <tr><td colspan="6"><div class="empty-state">No customers. <a href="{{ url_for('admin.customer_new') }}">Register</a>.</div></td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {{ pagination_nav(pagination) }}
+</div>
+{% endblock %}
